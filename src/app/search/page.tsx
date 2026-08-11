@@ -43,7 +43,7 @@ export default async function SearchResultsPage({
           </div>
         </dl>
 
-        <div className="mt-10 rounded-3xl border border-dashed border-slate-900/15 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm">
+        <div className="mt-10 rounded-3xl border border-dashed border-orange-300 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm">
           No inventory source is connected yet. Results will appear here once
           a car search API is integrated.
         </div>

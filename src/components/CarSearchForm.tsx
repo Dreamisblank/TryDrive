@@ -96,10 +96,10 @@ export default function CarSearchForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-4xl rounded-[28px] border border-slate-900/5 bg-white/90 p-2 shadow-[0_20px_60px_-15px_rgba(30,64,175,0.25)] backdrop-blur-xl sm:rounded-full"
+      className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 bg-white/90 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
-        <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-slate-900/[0.03] sm:min-w-[220px]">
+        <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:min-w-[220px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
             <PinIcon />
             Pickup location
@@ -150,7 +150,7 @@ export default function CarSearchForm() {
           </div>
         </div>
 
-        <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-slate-900/[0.03] sm:max-w-[160px]">
+        <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:max-w-[160px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
             <UserIcon />
             Driver age
@@ -171,7 +171,7 @@ export default function CarSearchForm() {
         <div className="flex items-center justify-center p-1.5 sm:pl-1.5">
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700 sm:w-auto"
           >
             <SearchIcon />
             Search
