@@ -112,7 +112,7 @@ export default function CarSearchForm() {
             placeholder="City or airport"
             value={pickupLocation}
             onChange={(event) => setPickupLocation(event.target.value)}
-            className="bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 placeholder:font-normal"
+            className="bg-transparent text-base font-medium text-slate-900 outline-none placeholder:text-slate-400 placeholder:font-normal"
           />
         </label>
 
@@ -121,7 +121,7 @@ export default function CarSearchForm() {
             <CalendarIcon />
             Dates
           </span>
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+          <div className="flex items-center gap-2 text-base font-medium text-slate-900">
             <div className="relative">
               <input
                 id="pickupDate"
@@ -164,7 +164,7 @@ export default function CarSearchForm() {
             max={99}
             value={driverAge}
             onChange={(event) => setDriverAge(event.target.value)}
-            className="bg-transparent text-sm font-medium text-slate-900 outline-none"
+            className="bg-transparent text-base font-medium text-slate-900 outline-none"
           />
         </label>
 
