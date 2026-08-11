@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const HEADLINES = [
   "Cheap wheels, zero hassle.",
   "Rent a car without the runaround.",
-  "Finding a cheap ride shouldn't feel like a road trip.",
+  "A cheap ride shouldn't take a detour to find.",
   "Skip the search. Score the deal.",
   "Car rentals, minus the headache.",
   "The easy way to a cheap ride.",

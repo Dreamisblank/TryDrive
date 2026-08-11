@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "TryDrive — Find your rental car",
   description:
     "Search rental cars by pickup location, dates, and driver age to compare available options and pricing.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffedd5",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
