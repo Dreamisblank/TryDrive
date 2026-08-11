@@ -9,7 +9,7 @@ export default function AnimatedLogo() {
 
   return (
     <span
-      className="h-8 w-8"
+      className="h-14 w-14"
       onMouseEnter={() => lottieRef.current?.play()}
       onMouseLeave={() => lottieRef.current?.stop()}
     >

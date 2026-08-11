@@ -8,8 +8,8 @@ export default function SiteHeader() {
         href="/"
         className="flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-900"
       >
-        <AnimatedLogo />
         TryDrive
+        <AnimatedLogo />
       </Link>
     </header>
   );
