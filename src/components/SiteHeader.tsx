@@ -6,7 +6,7 @@ export default function SiteHeader() {
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
       <Link
         href="/"
-        className="flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-900"
+        className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900"
       >
         TryDrive
         <AnimatedLogo />
