@@ -16,11 +16,11 @@ export default async function SearchResultsPage({
   const { location, pickupDate, dropoffDate, driverAge } = await searchParams;
 
   return (
-    <div className="relative flex-1">
+    <div className="flex-1">
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-6 pb-24">
+      <main className="mx-auto max-w-6xl px-6 pt-28 pb-24">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
           Search results
         </h1>

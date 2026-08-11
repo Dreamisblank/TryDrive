@@ -1,11 +1,17 @@
 export default function SkyBackground() {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-gradient-to-b from-orange-50 via-white to-white">
-      <div className="absolute -top-24 left-[8%] h-72 w-72 rounded-full bg-orange-200/70 blur-3xl" />
-      <div className="absolute top-10 right-[12%] h-96 w-96 rounded-full bg-orange-400/50 blur-3xl" />
-      <div className="absolute top-40 left-[30%] h-64 w-[36rem] rounded-full bg-orange-100 blur-3xl" />
-      <div className="absolute top-64 right-[5%] h-56 w-80 rounded-full bg-orange-300/40 blur-3xl" />
-      <div className="absolute top-72 left-[-5%] h-72 w-72 rounded-full bg-orange-500/30 blur-3xl" />
-    </div>
+    <div
+      className="pointer-events-none fixed inset-0 -z-10"
+      style={{
+        backgroundImage: [
+          "radial-gradient(50% 40% at 12% 15%, rgba(251,146,60,0.28) 0%, transparent 70%)",
+          "radial-gradient(45% 38% at 88% 10%, rgba(249,115,22,0.20) 0%, transparent 70%)",
+          "radial-gradient(55% 45% at 50% 50%, rgba(253,186,116,0.18) 0%, transparent 70%)",
+          "radial-gradient(50% 42% at 10% 85%, rgba(251,146,60,0.22) 0%, transparent 70%)",
+          "radial-gradient(48% 40% at 92% 88%, rgba(249,115,22,0.20) 0%, transparent 70%)",
+          "linear-gradient(to bottom, #fff7ed 0%, #ffffff 55%, #fff7ed 100%)",
+        ].join(", "),
+      }}
+    />
   );
 }
