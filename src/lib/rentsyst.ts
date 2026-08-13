@@ -223,7 +223,16 @@ export async function searchVehicles(
   });
 
   if (!response.ok) {
-    throw new Error(`RentSyst search failed: ${response.status}`);
+    const body: { message?: string; errors?: Record<string, string[]> } =
+      await response.json().catch(() => ({}));
+    const detail = body.errors
+      ? Object.values(body.errors).flat().join(" ")
+      : body.message;
+    throw new Error(
+      detail
+        ? `RentSyst search failed (${response.status}): ${detail}`
+        : `RentSyst search failed: ${response.status}`,
+    );
   }
 
   const data: RentSystSearchResponse = await response.json();

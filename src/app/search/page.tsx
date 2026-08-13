@@ -32,7 +32,10 @@ export default async function SearchResultsPage({
       });
     } catch (err) {
       console.error("RentSyst search failed:", err);
-      error = "Couldn't reach the RentSyst demo API. Please try again.";
+      const message = err instanceof Error ? err.message : "";
+      error = message.startsWith("RentSyst")
+        ? message
+        : "Couldn't reach the RentSyst demo API. Please try again.";
     }
   }
 

@@ -3,8 +3,28 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
+const DEMO_LOCATION_LABEL = "Larnaca, Cyprus (Demo)";
+
+// Local calendar date (not toISOString, which shifts to UTC and can land
+// on the wrong day depending on the browser's timezone offset).
+function toIso(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(iso: string, days: number) {
+  const date = new Date(`${iso}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return toIso(date);
+}
+
+// RentSyst evaluates the submitted date/time server-side without a
+// timezone, so a same-timezone "tomorrow" can still land in the past
+// there. A 2-day buffer comfortably clears that skew.
+function earliestPickupIso() {
+  return addDays(toIso(new Date()), 2);
 }
 
 function PinIcon() {
@@ -77,15 +97,22 @@ function SearchIcon() {
 
 export default function CarSearchForm() {
   const router = useRouter();
-  const [pickupLocation, setPickupLocation] = useState("");
-  const [pickupDate, setPickupDate] = useState(todayIso());
-  const [dropoffDate, setDropoffDate] = useState(todayIso());
+  const [pickupDate, setPickupDate] = useState(earliestPickupIso());
+  const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
   const [driverAge, setDriverAge] = useState("25");
+
+  function handlePickupDateChange(nextPickupDate: string) {
+    setPickupDate(nextPickupDate);
+    // Keep dropoff strictly after pickup instead of leaving a stale/invalid gap.
+    if (dropoffDate <= nextPickupDate) {
+      setDropoffDate(addDays(nextPickupDate, 1));
+    }
+  }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const params = new URLSearchParams({
-      location: pickupLocation,
+      location: DEMO_LOCATION_LABEL,
       pickupDate,
       dropoffDate,
       driverAge,
@@ -99,21 +126,19 @@ export default function CarSearchForm() {
       className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 bg-white/90 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
-        <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:min-w-[220px]">
+        <label className="flex flex-1 cursor-pointer flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:min-w-[220px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
             <PinIcon />
             Pickup location
           </span>
-          <input
+          <select
             id="pickupLocation"
             name="pickupLocation"
-            type="text"
-            required
-            placeholder="City or airport"
-            value={pickupLocation}
-            onChange={(event) => setPickupLocation(event.target.value)}
-            className="bg-transparent text-base font-medium text-slate-900 outline-none placeholder:text-slate-400 placeholder:font-normal"
-          />
+            defaultValue={DEMO_LOCATION_LABEL}
+            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 outline-none"
+          >
+            <option value={DEMO_LOCATION_LABEL}>{DEMO_LOCATION_LABEL}</option>
+          </select>
         </label>
 
         <div className="flex flex-1 flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 sm:min-w-[260px]">
@@ -128,9 +153,9 @@ export default function CarSearchForm() {
                 name="pickupDate"
                 type="date"
                 required
-                min={todayIso()}
+                min={earliestPickupIso()}
                 value={pickupDate}
-                onChange={(event) => setPickupDate(event.target.value)}
+                onChange={(event) => handlePickupDateChange(event.target.value)}
                 className="w-[104px] bg-transparent outline-none [color-scheme:light]"
               />
             </div>
@@ -141,7 +166,7 @@ export default function CarSearchForm() {
                 name="dropoffDate"
                 type="date"
                 required
-                min={pickupDate}
+                min={addDays(pickupDate, 1)}
                 value={dropoffDate}
                 onChange={(event) => setDropoffDate(event.target.value)}
                 className="w-[104px] bg-transparent outline-none [color-scheme:light]"
