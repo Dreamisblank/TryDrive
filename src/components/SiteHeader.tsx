@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import AnimatedLogo from "@/components/AnimatedLogo";
+import logo from "@/app/icon.png";
 
 export default function SiteHeader() {
   return (
@@ -9,7 +10,7 @@ export default function SiteHeader() {
         className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900"
       >
         TryDrive
-        <AnimatedLogo />
+        <Image src={logo} alt="" priority className="h-20 w-20" />
       </Link>
     </header>
   );
