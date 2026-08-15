@@ -9,11 +9,11 @@ const SEARCH_FOCUS = { lat: 34.916, lng: 33.62 };
 
 const IDLE_ROTATE_SPEED = 0.035; // radians/sec
 const ZOOM_DURATION_MS = 650;
-const ZOOM_CAMERA_Z = 1.8;
-const IDLE_CAMERA_Z = 2.6;
+const ZOOM_CAMERA_Z = 2.4;
+const IDLE_CAMERA_Z = 3.3;
 
 function createGlowSprite(): THREE.CanvasTexture {
-  const size = 64;
+  const size = 128;
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
@@ -72,13 +72,13 @@ export default function AtomicGlobe() {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    const positions = buildLandParticlePositions(18000);
+    const positions = buildLandParticlePositions(22000);
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     const sprite = createGlowSprite();
     const material = new THREE.PointsMaterial({
-      size: 0.028,
+      size: 0.018,
       map: sprite,
       color: 0xff8a3d,
       transparent: true,
