@@ -117,7 +117,20 @@ export default function CarSearchForm() {
       dropoffDate,
       driverAge,
     });
-    router.push(`/search?${params.toString()}`);
+    const destination = `/search?${params.toString()}`;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReducedMotion) {
+      router.push(destination);
+      return;
+    }
+
+    // Let the background globe zoom into the search location before
+    // navigating, rather than cutting away mid-animation.
+    window.dispatchEvent(new CustomEvent("trydrive:zoom-search"));
+    setTimeout(() => router.push(destination), 650);
   }
 
   return (

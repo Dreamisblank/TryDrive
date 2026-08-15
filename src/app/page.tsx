@@ -1,3 +1,4 @@
+import AtomicGlobeLoader from "@/components/AtomicGlobeLoader";
 import CarSearchForm from "@/components/CarSearchForm";
 import HeroHeadline from "@/components/HeroHeadline";
 import SiteHeader from "@/components/SiteHeader";
@@ -7,6 +8,7 @@ export default function Home() {
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
       <SkyBackground />
+      <AtomicGlobeLoader />
       <SiteHeader />
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
