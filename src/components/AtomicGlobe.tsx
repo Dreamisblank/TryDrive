@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import {
-  buildFlightArcs,
+  buildRandomFlightArcs,
   buildLandParticlePositions,
   latLngToVector3,
 } from "@/lib/globeGeometry";
@@ -11,17 +11,28 @@ import {
 // Demo inventory is fixed to Larnaca, Cyprus - see src/lib/rentsyst.ts.
 const SEARCH_FOCUS = { lat: 34.916, lng: 33.62 };
 
-// Decorative flight paths radiating from the search location.
-const FLIGHT_DESTINATIONS = [
+// Decorative flight paths between random major airports worldwide - not
+// tied to the search location. Kept broad and continent-spanning so a
+// random subset always reads as global, not clustered in one region.
+const WORLD_AIRPORTS = [
+  { lat: 40.7128, lng: -74.006 }, // New York
+  { lat: 34.0522, lng: -118.2437 }, // Los Angeles
+  { lat: 43.6532, lng: -79.3832 }, // Toronto
+  { lat: 19.4326, lng: -99.1332 }, // Mexico City
+  { lat: -23.5505, lng: -46.6333 }, // Sao Paulo
   { lat: 51.5074, lng: -0.1278 }, // London
   { lat: 48.8566, lng: 2.3522 }, // Paris
-  { lat: 41.9028, lng: 12.4964 }, // Rome
-  { lat: 50.1109, lng: 8.6821 }, // Frankfurt
   { lat: 55.7558, lng: 37.6173 }, // Moscow
+  { lat: -33.9249, lng: 18.4241 }, // Cape Town
+  { lat: -1.2921, lng: 36.8219 }, // Nairobi
   { lat: 25.2048, lng: 55.2708 }, // Dubai
-  { lat: 30.0444, lng: 31.2357 }, // Cairo
-  { lat: 41.0082, lng: 28.9784 }, // Istanbul
+  { lat: 19.076, lng: 72.8777 }, // Mumbai
+  { lat: 39.9042, lng: 116.4074 }, // Beijing
+  { lat: 1.3521, lng: 103.8198 }, // Singapore
+  { lat: 35.6762, lng: 139.6503 }, // Tokyo
+  { lat: -33.8688, lng: 151.2093 }, // Sydney
 ];
+const FLIGHT_ARC_COUNT = 6; // keep it uncluttered
 
 const IDLE_ROTATE_SPEED = 0.035; // radians/sec
 const ZOOM_DURATION_MS = 650;
@@ -112,7 +123,7 @@ export default function AtomicGlobe() {
     // the traveling glow is driven entirely by a single uTime uniform in
     // the fragment shader, so adding more arcs costs no extra per-frame
     // CPU work.
-    const arcs = buildFlightArcs(SEARCH_FOCUS, FLIGHT_DESTINATIONS);
+    const arcs = buildRandomFlightArcs(WORLD_AIRPORTS, FLIGHT_ARC_COUNT);
     const arcsGeometry = new THREE.BufferGeometry();
     arcsGeometry.setAttribute(
       "position",

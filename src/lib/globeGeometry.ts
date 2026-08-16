@@ -158,47 +158,67 @@ function slerpUnitVectors(
 
 export type LatLng = { lat: number; lng: number };
 
+function appendArc(
+  a: [number, number, number],
+  b: [number, number, number],
+  segments: number,
+  maxHeight: number,
+  arcSeed: number,
+  out: { positions: number[]; progress: number[]; seed: number[] },
+) {
+  let prev: [number, number, number] | null = null;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const [sx, sy, sz] = slerpUnitVectors(a, b, t);
+    const height = 1 + maxHeight * Math.sin(Math.PI * t);
+    const point: [number, number, number] = [sx * height, sy * height, sz * height];
+
+    if (prev) {
+      out.positions.push(prev[0], prev[1], prev[2], point[0], point[1], point[2]);
+      out.progress.push((i - 1) / segments, t);
+      out.seed.push(arcSeed, arcSeed);
+    }
+    prev = point;
+  }
+}
+
 /**
- * Builds a single LineSegments-ready buffer set for great-circle arcs from
- * one origin to several destinations, each lifted above the sphere surface
- * in a smooth arc. All arcs share one geometry (one draw call); aProgress
- * (0-1 along the arc) and aSeed (per-arc phase offset) let a shader animate
- * a traveling pulse along each line without any per-frame CPU work.
+ * Builds a single LineSegments-ready buffer set for great-circle arcs
+ * between random pairs of airports (not tied to any single origin), each
+ * lifted above the sphere surface. All arcs share one geometry (one draw
+ * call); aProgress (0-1 along the arc) and aSeed (per-arc phase offset)
+ * let a shader animate a traveling pulse along each line without any
+ * per-frame CPU work.
  */
-export function buildFlightArcs(
-  origin: LatLng,
-  destinations: LatLng[],
+export function buildRandomFlightArcs(
+  airports: LatLng[],
+  arcCount: number,
   segments = 48,
   maxHeight = 0.22,
 ): { positions: Float32Array; progress: Float32Array; seed: Float32Array } {
-  const a = latLngToVector3(origin.lat, origin.lng, 1);
-  const positions: number[] = [];
-  const progress: number[] = [];
-  const seed: number[] = [];
+  const out = { positions: [] as number[], progress: [] as number[], seed: [] as number[] };
+  const usedPairs = new Set<string>();
+  let created = 0;
+  let attempts = 0;
 
-  destinations.forEach((dest, arcIndex) => {
-    const b = latLngToVector3(dest.lat, dest.lng, 1);
-    const arcSeed = arcIndex / destinations.length;
-    let prev: [number, number, number] | null = null;
+  while (created < arcCount && attempts < arcCount * 20) {
+    attempts++;
+    const i = Math.floor(Math.random() * airports.length);
+    const j = Math.floor(Math.random() * airports.length);
+    if (i === j) continue;
+    const key = i < j ? `${i}-${j}` : `${j}-${i}`;
+    if (usedPairs.has(key)) continue;
+    usedPairs.add(key);
 
-    for (let i = 0; i <= segments; i++) {
-      const t = i / segments;
-      const [sx, sy, sz] = slerpUnitVectors(a, b, t);
-      const height = 1 + maxHeight * Math.sin(Math.PI * t);
-      const point: [number, number, number] = [sx * height, sy * height, sz * height];
-
-      if (prev) {
-        positions.push(prev[0], prev[1], prev[2], point[0], point[1], point[2]);
-        progress.push((i - 1) / segments, t);
-        seed.push(arcSeed, arcSeed);
-      }
-      prev = point;
-    }
-  });
+    const a = latLngToVector3(airports[i].lat, airports[i].lng, 1);
+    const b = latLngToVector3(airports[j].lat, airports[j].lng, 1);
+    appendArc(a, b, segments, maxHeight, created / arcCount, out);
+    created++;
+  }
 
   return {
-    positions: new Float32Array(positions),
-    progress: new Float32Array(progress),
-    seed: new Float32Array(seed),
+    positions: new Float32Array(out.positions),
+    progress: new Float32Array(out.progress),
+    seed: new Float32Array(out.seed),
   };
 }
