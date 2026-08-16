@@ -135,3 +135,70 @@ export function buildLandParticlePositions(candidateCount: number): Float32Array
 
   return new Float32Array(positions);
 }
+
+function slerpUnitVectors(
+  a: [number, number, number],
+  b: [number, number, number],
+  t: number,
+): [number, number, number] {
+  const dot = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
+  const theta = Math.acos(dot) * t;
+  const relX = b[0] - a[0] * dot;
+  const relY = b[1] - a[1] * dot;
+  const relZ = b[2] - a[2] * dot;
+  const relLen = Math.sqrt(relX * relX + relY * relY + relZ * relZ) || 1;
+  const cosT = Math.cos(theta);
+  const sinT = Math.sin(theta);
+  return [
+    a[0] * cosT + (relX / relLen) * sinT,
+    a[1] * cosT + (relY / relLen) * sinT,
+    a[2] * cosT + (relZ / relLen) * sinT,
+  ];
+}
+
+export type LatLng = { lat: number; lng: number };
+
+/**
+ * Builds a single LineSegments-ready buffer set for great-circle arcs from
+ * one origin to several destinations, each lifted above the sphere surface
+ * in a smooth arc. All arcs share one geometry (one draw call); aProgress
+ * (0-1 along the arc) and aSeed (per-arc phase offset) let a shader animate
+ * a traveling pulse along each line without any per-frame CPU work.
+ */
+export function buildFlightArcs(
+  origin: LatLng,
+  destinations: LatLng[],
+  segments = 48,
+  maxHeight = 0.22,
+): { positions: Float32Array; progress: Float32Array; seed: Float32Array } {
+  const a = latLngToVector3(origin.lat, origin.lng, 1);
+  const positions: number[] = [];
+  const progress: number[] = [];
+  const seed: number[] = [];
+
+  destinations.forEach((dest, arcIndex) => {
+    const b = latLngToVector3(dest.lat, dest.lng, 1);
+    const arcSeed = arcIndex / destinations.length;
+    let prev: [number, number, number] | null = null;
+
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const [sx, sy, sz] = slerpUnitVectors(a, b, t);
+      const height = 1 + maxHeight * Math.sin(Math.PI * t);
+      const point: [number, number, number] = [sx * height, sy * height, sz * height];
+
+      if (prev) {
+        positions.push(prev[0], prev[1], prev[2], point[0], point[1], point[2]);
+        progress.push((i - 1) / segments, t);
+        seed.push(arcSeed, arcSeed);
+      }
+      prev = point;
+    }
+  });
+
+  return {
+    positions: new Float32Array(positions),
+    progress: new Float32Array(progress),
+    seed: new Float32Array(seed),
+  };
+}

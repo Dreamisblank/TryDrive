@@ -2,15 +2,32 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { buildLandParticlePositions, latLngToVector3 } from "@/lib/globeGeometry";
+import {
+  buildFlightArcs,
+  buildLandParticlePositions,
+  latLngToVector3,
+} from "@/lib/globeGeometry";
 
 // Demo inventory is fixed to Larnaca, Cyprus - see src/lib/rentsyst.ts.
 const SEARCH_FOCUS = { lat: 34.916, lng: 33.62 };
+
+// Decorative flight paths radiating from the search location.
+const FLIGHT_DESTINATIONS = [
+  { lat: 51.5074, lng: -0.1278 }, // London
+  { lat: 48.8566, lng: 2.3522 }, // Paris
+  { lat: 41.9028, lng: 12.4964 }, // Rome
+  { lat: 50.1109, lng: 8.6821 }, // Frankfurt
+  { lat: 55.7558, lng: 37.6173 }, // Moscow
+  { lat: 25.2048, lng: 55.2708 }, // Dubai
+  { lat: 30.0444, lng: 31.2357 }, // Cairo
+  { lat: 41.0082, lng: 28.9784 }, // Istanbul
+];
 
 const IDLE_ROTATE_SPEED = 0.035; // radians/sec
 const ZOOM_DURATION_MS = 650;
 const ZOOM_CAMERA_Z = 2.4;
 const IDLE_CAMERA_Z = 3.3;
+const FLIGHT_PULSE_SPEED = 0.18; // fraction of arc traveled per second
 
 function createGlowSprite(): THREE.CanvasTexture {
   const size = 128;
@@ -91,6 +108,60 @@ export default function AtomicGlobe() {
     const points = new THREE.Points(geometry, material);
     globeGroup.add(points);
 
+    // Animated flight-path arcs. All arcs share one geometry/one draw call;
+    // the traveling glow is driven entirely by a single uTime uniform in
+    // the fragment shader, so adding more arcs costs no extra per-frame
+    // CPU work.
+    const arcs = buildFlightArcs(SEARCH_FOCUS, FLIGHT_DESTINATIONS);
+    const arcsGeometry = new THREE.BufferGeometry();
+    arcsGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(arcs.positions, 3),
+    );
+    arcsGeometry.setAttribute(
+      "aProgress",
+      new THREE.BufferAttribute(arcs.progress, 1),
+    );
+    arcsGeometry.setAttribute("aSeed", new THREE.BufferAttribute(arcs.seed, 1));
+
+    const arcsMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(0xffb066) },
+      },
+      vertexShader: `
+        attribute float aProgress;
+        attribute float aSeed;
+        varying float vProgress;
+        varying float vSeed;
+        void main() {
+          vProgress = aProgress;
+          vSeed = aSeed;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor;
+        varying float vProgress;
+        varying float vSeed;
+        void main() {
+          float pulsePos = fract(uTime * ${FLIGHT_PULSE_SPEED.toFixed(3)} + vSeed);
+          float dist = abs(vProgress - pulsePos);
+          dist = min(dist, 1.0 - dist);
+          float pulse = smoothstep(0.14, 0.0, dist);
+          float intensity = 0.14 + pulse * 0.9;
+          gl_FragColor = vec4(uColor, intensity);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const flightLines = new THREE.LineSegments(arcsGeometry, arcsMaterial);
+    globeGroup.add(flightLines);
+
     // Face the globe toward a neutral starting longitude so the initial
     // idle view isn't blank ocean.
     globeGroup.rotation.y = -0.4;
@@ -148,6 +219,10 @@ export default function AtomicGlobe() {
         globeGroup.rotation.y += dt * IDLE_ROTATE_SPEED;
       }
 
+      if (!prefersReducedMotion) {
+        arcsMaterial.uniforms.uTime.value += dt;
+      }
+
       renderer.render(scene, camera);
       frameId = requestAnimationFrame(animate);
     }
@@ -174,6 +249,8 @@ export default function AtomicGlobe() {
       geometry.dispose();
       material.dispose();
       sprite.dispose();
+      arcsGeometry.dispose();
+      arcsMaterial.dispose();
       renderer.dispose();
       container.removeChild(renderer.domElement);
     };
