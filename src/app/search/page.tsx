@@ -1,3 +1,4 @@
+import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import SearchResults from "@/components/SearchResults";
@@ -112,6 +113,8 @@ export default async function SearchResultsPage({
           </>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

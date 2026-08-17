@@ -1,6 +1,7 @@
 import AtomicGlobeLoader from "@/components/AtomicGlobeLoader";
 import CarSearchForm from "@/components/CarSearchForm";
 import HeroHeadline from "@/components/HeroHeadline";
+import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 
@@ -21,6 +22,8 @@ export default function Home() {
           Demo mode — results limited to Larnaca, Cyprus
         </p>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }
