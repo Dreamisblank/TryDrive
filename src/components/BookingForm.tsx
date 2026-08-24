@@ -3,7 +3,14 @@
 import { useMemo, useState } from "react";
 import type { NormalizedVehicle } from "@/lib/rentsyst";
 
-type BookingResult = { bookingId: string; cabinetUrl: string };
+type BookingResult = { bookingId: string };
+type DriverInfo = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  birthdate: string;
+};
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-400";
@@ -61,6 +68,7 @@ export default function BookingForm({
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(
     null,
   );
+  const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
 
   const selectedInsurance =
@@ -84,6 +92,13 @@ export default function BookingForm({
     const form = new FormData(event.currentTarget);
     const birthdate = String(form.get("birthdate") || "");
     const comment = String(form.get("comment") || "");
+    const driver: DriverInfo = {
+      firstName: String(form.get("firstName") || ""),
+      lastName: String(form.get("lastName") || ""),
+      email: String(form.get("email") || ""),
+      phone: String(form.get("phone") || ""),
+      birthdate,
+    };
 
     try {
       const response = await fetch("/api/booking", {
@@ -99,13 +114,7 @@ export default function BookingForm({
           vehicleName: vehicle.name,
           totalPrice: total,
           currencySymbol: c,
-          driver: {
-            firstName: String(form.get("firstName") || ""),
-            lastName: String(form.get("lastName") || ""),
-            email: String(form.get("email") || ""),
-            phone: String(form.get("phone") || ""),
-            birthdate: birthdate || undefined,
-          },
+          driver: { ...driver, birthdate: driver.birthdate || undefined },
           comment: comment || undefined,
         }),
       });
@@ -115,7 +124,8 @@ export default function BookingForm({
         throw new Error(data.error || "Couldn't create the booking.");
       }
 
-      setBookingResult({ bookingId: data.bookingId, cabinetUrl: data.cabinetUrl });
+      setDriverInfo(driver);
+      setBookingResult({ bookingId: data.bookingId });
     } catch (err) {
       setBookingError(
         err instanceof Error ? err.message : "Couldn't create the booking.",
@@ -125,23 +135,37 @@ export default function BookingForm({
     }
   }
 
-  if (bookingResult) {
+  if (bookingResult && driverInfo) {
+    const rows: [string, string][] = [
+      ["Reference", bookingResult.bookingId],
+      ["Vehicle", vehicle.name],
+      ["Pickup", `${formatDate(pickupDate)} · Larnaca, Cyprus (Demo)`],
+      ["Return", `${formatDate(dropoffDate)} · Larnaca, Cyprus (Demo)`],
+      ["Driver", `${driverInfo.firstName} ${driverInfo.lastName}`],
+      ["Email", driverInfo.email],
+      ["Phone", driverInfo.phone],
+      ...(selectedInsurance ? ([["Insurance", selectedInsurance.name]] as [string, string][]) : []),
+      ["Total", `${c}${total.toFixed(2)}`],
+    ];
+
     return (
-      <div className="mt-8 rounded-3xl border border-green-200 bg-green-50 p-8 text-center">
+      <div className="mt-8 rounded-3xl border border-green-200 bg-green-50 p-8">
         <h2 className="text-xl font-semibold text-green-900">
           Booking confirmed
         </h2>
-        <p className="mt-2 text-sm text-green-800">
-          Reference: <span className="font-mono">{bookingResult.bookingId}</span>
-        </p>
-        <a
-          href={bookingResult.cabinetUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-block rounded-full bg-green-700 px-6 py-2 text-sm font-semibold text-white hover:bg-green-800"
-        >
-          View in the RentSyst booking portal
-        </a>
+        <dl className="mt-5 divide-y divide-green-200/70">
+          {rows.map(([label, value]) => (
+            <div
+              key={label}
+              className="flex justify-between gap-4 py-2.5 text-sm"
+            >
+              <dt className="text-green-700">{label}</dt>
+              <dd className="text-right font-medium text-green-900">
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
     );
   }
