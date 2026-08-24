@@ -45,7 +45,7 @@ export default async function SearchResultsPage({
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-6 pt-28 pb-24">
+      <main className="mx-auto max-w-6xl px-6 pt-4 pb-24">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
           Search results
         </h1>

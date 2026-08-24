@@ -33,7 +33,7 @@ export default function TermsOfServicePage() {
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-3xl px-6 pt-28 pb-24">
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
         <Link
           href="/"
           className="text-sm font-medium text-orange-700 hover:text-orange-800"
