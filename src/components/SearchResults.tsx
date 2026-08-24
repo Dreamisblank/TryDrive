@@ -8,10 +8,14 @@ export default function SearchResults({
   vehicles,
   categories,
   driverAge,
+  pickupDate,
+  dropoffDate,
 }: {
   vehicles: NormalizedVehicle[];
   categories: string[];
   driverAge: number;
+  pickupDate: string;
+  dropoffDate: string;
 }) {
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
 
@@ -61,6 +65,8 @@ export default function SearchResults({
               key={vehicle.id}
               vehicle={vehicle}
               driverAge={driverAge}
+              pickupDate={pickupDate}
+              dropoffDate={dropoffDate}
             />
           ))}
         </div>

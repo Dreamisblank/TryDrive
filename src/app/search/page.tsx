@@ -107,6 +107,8 @@ export default async function SearchResultsPage({
                   vehicles={results.vehicles}
                   categories={results.categories}
                   driverAge={parsedAge}
+                  pickupDate={pickupDate!}
+                  dropoffDate={dropoffDate!}
                 />
               </div>
             )}

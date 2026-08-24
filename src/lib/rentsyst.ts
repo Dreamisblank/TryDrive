@@ -2,9 +2,14 @@ import "server-only";
 
 const AUTH_URL = "https://api-aggregator.rentsyst.com/oauth2/token";
 const RATES_URL = "https://api-aggregator.rentsyst.com/v1/rates";
+const BOOKING_URL = "https://api-aggregator.rentsyst.com/v1/booking";
 
 // Demo account inventory only exists around Larnaca, Cyprus.
 const DEMO_PICKUP_LOCATION = "34.916,33.620";
+// Every vehicle in the demo inventory operates out of this single location
+// (Larnaca Airport). The /v1/rates/:id endpoint 500s without an explicit
+// location id - coordinates alone aren't enough there, unlike /v1/rates.
+const DEMO_PICKUP_LOCATION_ID = "3337";
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
@@ -81,6 +86,10 @@ type RentSystVehicle = {
   prices: { rental: number; delivery: number | null };
   requirements?: { min_driver_age?: number };
   company: { id: number; name: string };
+  locations: {
+    pickup: { id: number };
+    return: { id: number };
+  };
 };
 
 type RentSystSearchResponse = {
@@ -99,12 +108,19 @@ export type NormalizedVehicle = {
   image: string | null;
   currencySymbol: string;
   rentalPrice: number;
-  cheapestInsurance: { name: string; price: number } | null;
+  cheapestInsurance: { id: number; name: string; price: number } | null;
   ageSurcharge: { name: string; minAge: number; maxAge: number; price: number } | null;
   totalPrice: number;
   minDriverAge: number | null;
   company: string;
-  insuranceOptions: { name: string; price: number; description: string }[];
+  insuranceOptions: {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+  }[];
+  pickupLocationId: number;
+  returnLocationId: number;
 };
 
 export type SearchVehiclesParams = {
@@ -184,17 +200,24 @@ function normalizeVehicle(
       currencySymbol: entry.currency?.symbol ?? "€",
       rentalPrice: entry.prices.rental,
       cheapestInsurance: cheapestInsurance
-        ? { name: cheapestInsurance.name, price: cheapestInsurance.total_price }
+        ? {
+            id: cheapestInsurance.id,
+            name: cheapestInsurance.name,
+            price: cheapestInsurance.total_price,
+          }
         : null,
       ageSurcharge,
       totalPrice,
       minDriverAge,
       company: entry.company?.name ?? "",
       insuranceOptions: insurances.map((i) => ({
+        id: i.id,
         name: i.name,
         price: i.total_price,
         description: i.description,
       })),
+      pickupLocationId: entry.locations.pickup.id,
+      returnLocationId: entry.locations.return.id,
     },
   };
 }
@@ -257,4 +280,141 @@ export async function searchVehicles(
   const categories = Array.from(new Set(eligible.map((v) => v.category))).sort();
 
   return { vehicles: eligible, categories, excludedForMinAge };
+}
+
+export type VehicleDetailsResult = {
+  vehicle: NormalizedVehicle;
+  eligible: boolean;
+};
+
+/**
+ * Looks up a single vehicle by id for the booking/detail page, instead of
+ * re-running the full search and filtering client-side.
+ */
+export async function getVehicleDetails(
+  vehicleId: number,
+  params: SearchVehiclesParams,
+): Promise<VehicleDetailsResult | null> {
+  const token = await getAccessToken();
+
+  const query = new URLSearchParams({
+    pickup_location: DEMO_PICKUP_LOCATION,
+    return_location: DEMO_PICKUP_LOCATION,
+    pickup_location_id: DEMO_PICKUP_LOCATION_ID,
+    return_location_id: DEMO_PICKUP_LOCATION_ID,
+    pickup_datetime: `${params.pickupDate} 10:00:00`,
+    return_datetime: `${params.dropoffDate} 10:00:00`,
+    pickup_delivery: "0",
+    return_delivery: "0",
+    currency: "eur",
+  });
+
+  const response = await fetch(
+    `${RATES_URL}/${vehicleId}?${query.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    },
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const body: { message?: string; errors?: Record<string, string[]> } =
+      await response.json().catch(() => ({}));
+    const detail = body.errors
+      ? Object.values(body.errors).flat().join(" ")
+      : body.message;
+    throw new Error(
+      detail
+        ? `RentSyst vehicle lookup failed (${response.status}): ${detail}`
+        : `RentSyst vehicle lookup failed: ${response.status}`,
+    );
+  }
+
+  const entry: RentSystVehicle = await response.json();
+  const { normalized, eligible } = normalizeVehicle(entry, params.driverAge);
+  return { vehicle: normalized, eligible };
+}
+
+export type CreateBookingParams = {
+  vehicleId: number;
+  pickupLocationId: number;
+  returnLocationId: number;
+  pickupDatetime: string; // "YYYY-MM-DD HH:mm:ss"
+  returnDatetime: string;
+  insuranceId?: number;
+  driver: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    birthdate?: string; // YYYY-MM-DD
+  };
+  comment?: string;
+};
+
+export type CreateBookingResult = {
+  bookingId: string;
+  clientId: number;
+  cabinetUrl: string;
+};
+
+export async function createBooking(
+  params: CreateBookingParams,
+): Promise<CreateBookingResult> {
+  const token = await getAccessToken();
+
+  const form = new FormData();
+  form.set("vehicle_id", String(params.vehicleId));
+  form.set("pickup_location_id", String(params.pickupLocationId));
+  form.set("return_location_id", String(params.returnLocationId));
+  form.set("pickup_datetime", params.pickupDatetime);
+  form.set("return_datetime", params.returnDatetime);
+  form.set("drivers[0][first_name]", params.driver.firstName);
+  form.set("drivers[0][last_name]", params.driver.lastName);
+  form.set("drivers[0][email]", params.driver.email);
+  form.set("drivers[0][phone]", params.driver.phone);
+  if (params.driver.birthdate) {
+    form.set("drivers[0][birthdate]", params.driver.birthdate);
+  }
+  if (params.insuranceId) {
+    form.set("extras[insurance]", String(params.insuranceId));
+  }
+  if (params.comment) {
+    form.set("comment", params.comment);
+  }
+  form.set("pickup_delivery", "0");
+  form.set("return_delivery", "0");
+
+  const response = await fetch(BOOKING_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  const body: {
+    message?: string;
+    errors?: Record<string, string[]>;
+    data?: { booking_id: string; client_id: number; cabinet_url: string };
+  } = await response.json().catch(() => ({}));
+
+  if (!response.ok || !body.data) {
+    const detail = body.errors
+      ? Object.values(body.errors).flat().join(" ")
+      : body.message;
+    throw new Error(
+      detail
+        ? `RentSyst booking failed (${response.status}): ${detail}`
+        : `RentSyst booking failed: ${response.status}`,
+    );
+  }
+
+  return {
+    bookingId: body.data.booking_id,
+    clientId: body.data.client_id,
+    cabinetUrl: body.data.cabinet_url,
+  };
 }
