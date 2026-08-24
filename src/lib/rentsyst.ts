@@ -3,6 +3,7 @@ import "server-only";
 const AUTH_URL = "https://api-aggregator.rentsyst.com/oauth2/token";
 const RATES_URL = "https://api-aggregator.rentsyst.com/v1/rates";
 const BOOKING_URL = "https://api-aggregator.rentsyst.com/v1/booking";
+const ORDER_VIEW_URL = "https://api-aggregator.rentsyst.com/v1/order/view";
 
 // Demo account inventory only exists around Larnaca, Cyprus.
 const DEMO_PICKUP_LOCATION = "34.916,33.620";
@@ -398,6 +399,7 @@ export async function createBooking(
   }
   form.set("pickup_delivery", "0");
   form.set("return_delivery", "0");
+  form.set("currency", "eur");
 
   const response = await fetch(BOOKING_URL, {
     method: "POST",
@@ -427,4 +429,30 @@ export async function createBooking(
     clientId: body.data.client_id,
     cabinetUrl: body.data.cabinet_url,
   };
+}
+
+/**
+ * RentSyst's /v1/rates quote never includes taxes, and doesn't reflect
+ * mandatory fees (e.g. delivery) that get applied once a booking actually
+ * exists - the quoted price and the real invoice can genuinely differ.
+ * This looks up the authoritative total straight from the created order so
+ * the confirmation screen and the admin log show what was actually charged,
+ * not our pre-booking estimate.
+ */
+export async function getOrderTotal(bookingId: string): Promise<number | null> {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(
+      `${ORDER_VIEW_URL}?id=${encodeURIComponent(bookingId)}`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    );
+    if (!response.ok) return null;
+
+    const body: { data?: { totals?: { total: number } } } = await response
+      .json()
+      .catch(() => ({}));
+    return body.data?.totals?.total ?? null;
+  } catch {
+    return null;
+  }
 }

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { NormalizedVehicle } from "@/lib/rentsyst";
 
-type BookingResult = { bookingId: string };
+type BookingResult = { bookingId: string; totalPrice: number };
 type DriverInfo = {
   firstName: string;
   lastName: string;
@@ -125,7 +125,10 @@ export default function BookingForm({
       }
 
       setDriverInfo(driver);
-      setBookingResult({ bookingId: data.bookingId });
+      setBookingResult({
+        bookingId: data.bookingId,
+        totalPrice: typeof data.totalPrice === "number" ? data.totalPrice : total,
+      });
     } catch (err) {
       setBookingError(
         err instanceof Error ? err.message : "Couldn't create the booking.",
@@ -145,7 +148,7 @@ export default function BookingForm({
       ["Email", driverInfo.email],
       ["Phone", driverInfo.phone],
       ...(selectedInsurance ? ([["Insurance", selectedInsurance.name]] as [string, string][]) : []),
-      ["Total", `${c}${total.toFixed(2)}`],
+      ["Total", `${c}${bookingResult.totalPrice.toFixed(2)}`],
     ];
 
     return (
@@ -166,6 +169,13 @@ export default function BookingForm({
             </div>
           ))}
         </dl>
+        {Math.abs(bookingResult.totalPrice - total) > 0.01 && (
+          <p className="mt-4 text-xs text-green-800">
+            The total above reflects the final amount confirmed by the
+            rental company, including any taxes or fees not shown in the
+            earlier estimate.
+          </p>
+        )}
       </div>
     );
   }
@@ -309,6 +319,10 @@ export default function BookingForm({
             {total.toFixed(2)}
           </span>
         </div>
+        <p className="mt-2 text-xs text-slate-400">
+          Estimated total. The rental company may confirm a different final
+          amount, including taxes or fees, once your booking is created.
+        </p>
       </div>
 
       {/* Driver details + submit */}

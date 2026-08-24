@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createBooking } from "@/lib/rentsyst";
+import { createBooking, getOrderTotal } from "@/lib/rentsyst";
 import { appendBookingLog } from "@/lib/bookingLog";
 
 type BookingRequestBody = {
@@ -73,20 +73,30 @@ export async function POST(request: Request) {
       comment: body.comment,
     });
 
+    // RentSyst's quote never includes taxes or the mandatory delivery fee,
+    // so the real total is only known once the order exists. Fall back to
+    // our pre-booking estimate if the lookup fails for any reason - the
+    // booking itself already succeeded, so we shouldn't fail the request
+    // over this.
+    const confirmedTotal = await getOrderTotal(result.bookingId);
+    const totalPrice =
+      confirmedTotal ??
+      (typeof body.totalPrice === "number" ? body.totalPrice : 0);
+
     await appendBookingLog({
       timestamp: new Date().toISOString(),
       bookingId: result.bookingId,
       clientId: result.clientId,
       vehicleId: Number(body.vehicleId),
       vehicleName: body.vehicleName || "Unknown vehicle",
-      totalPrice: typeof body.totalPrice === "number" ? body.totalPrice : 0,
+      totalPrice,
       currencySymbol: body.currencySymbol || "€",
       driverName: `${driver!.firstName} ${driver!.lastName}`,
       driverEmail: driver!.email,
       cabinetUrl: result.cabinetUrl,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, totalPrice });
   } catch (err) {
     console.error(
       "Booking creation failed:",
