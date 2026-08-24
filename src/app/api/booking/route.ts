@@ -13,7 +13,7 @@ type BookingRequestBody = {
     lastName: string;
     email: string;
     phone: string;
-    birthdate?: string;
+    birthdate: string;
   };
   comment?: string;
 };
@@ -41,6 +41,8 @@ export async function POST(request: Request) {
   if (!driver || !isNonEmptyString(driver.lastName)) missing.push("driver.lastName");
   if (!driver || !isNonEmptyString(driver.email)) missing.push("driver.email");
   if (!driver || !isNonEmptyString(driver.phone)) missing.push("driver.phone");
+  if (!driver || !isNonEmptyString(driver.birthdate))
+    missing.push("driver.birthdate");
 
   if (missing.length > 0) {
     return NextResponse.json(

@@ -169,7 +169,7 @@ export default function CarSearchForm() {
                 min={earliestPickupIso()}
                 value={pickupDate}
                 onChange={(event) => handlePickupDateChange(event.target.value)}
-                className="w-[104px] bg-transparent outline-none [color-scheme:light]"
+                className="date-pill-input w-[104px] bg-transparent outline-none [color-scheme:light]"
               />
             </div>
             <span className="text-slate-400">&rarr;</span>
@@ -182,7 +182,7 @@ export default function CarSearchForm() {
                 min={addDays(pickupDate, 1)}
                 value={dropoffDate}
                 onChange={(event) => setDropoffDate(event.target.value)}
-                className="w-[104px] bg-transparent outline-none [color-scheme:light]"
+                className="date-pill-input w-[104px] bg-transparent outline-none [color-scheme:light]"
               />
             </div>
           </div>

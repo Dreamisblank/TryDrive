@@ -320,8 +320,13 @@ export default function BookingForm({
             className={inputClass}
           />
           <label className="flex flex-col gap-1 text-xs text-slate-500">
-            Date of birth (optional)
-            <input name="birthdate" type="date" className={inputClass} />
+            Date of birth
+            <input
+              name="birthdate"
+              type="date"
+              required
+              className={inputClass}
+            />
           </label>
           <label className="flex flex-col gap-1 text-xs text-slate-500 sm:col-span-2">
             Notes for the rental company (optional)
