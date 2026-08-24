@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createBooking } from "@/lib/rentsyst";
+import { appendBookingLog } from "@/lib/bookingLog";
 
 type BookingRequestBody = {
   vehicleId: number;
@@ -8,6 +9,9 @@ type BookingRequestBody = {
   pickupDatetime: string;
   returnDatetime: string;
   insuranceId?: number;
+  vehicleName?: string;
+  totalPrice?: number;
+  currencySymbol?: string;
   driver: {
     firstName: string;
     lastName: string;
@@ -68,6 +72,20 @@ export async function POST(request: Request) {
       },
       comment: body.comment,
     });
+
+    await appendBookingLog({
+      timestamp: new Date().toISOString(),
+      bookingId: result.bookingId,
+      clientId: result.clientId,
+      vehicleId: Number(body.vehicleId),
+      vehicleName: body.vehicleName || "Unknown vehicle",
+      totalPrice: typeof body.totalPrice === "number" ? body.totalPrice : 0,
+      currencySymbol: body.currencySymbol || "€",
+      driverName: `${driver!.firstName} ${driver!.lastName}`,
+      driverEmail: driver!.email,
+      cabinetUrl: result.cabinetUrl,
+    });
+
     return NextResponse.json(result);
   } catch (err) {
     console.error(

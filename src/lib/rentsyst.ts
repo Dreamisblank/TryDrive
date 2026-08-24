@@ -46,6 +46,16 @@ async function getAccessToken(): Promise<string> {
   return cachedToken.value;
 }
 
+/** Used by the admin dashboard as a live "is the API reachable" check. */
+export async function checkRentSystConnection(): Promise<boolean> {
+  try {
+    await getAccessToken();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 type RentSystOption = {
   id: number;
   name: string;

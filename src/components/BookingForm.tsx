@@ -96,6 +96,9 @@ export default function BookingForm({
           pickupDatetime: `${pickupDate} 10:00:00`,
           returnDatetime: `${dropoffDate} 10:00:00`,
           insuranceId: selectedInsurance?.id,
+          vehicleName: vehicle.name,
+          totalPrice: total,
+          currencySymbol: c,
           driver: {
             firstName: String(form.get("firstName") || ""),
             lastName: String(form.get("lastName") || ""),

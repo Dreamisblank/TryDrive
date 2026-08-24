@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local booking log (flat-file store, not committed)
+/data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
