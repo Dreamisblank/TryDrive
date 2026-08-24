@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Without this, Next prerenders the page once at build time and serves
+// that static snapshot forever — real bookings logged afterward would
+// never show up.
+export const dynamic = "force-dynamic";
+
 function formatTimestamp(iso: string) {
   const date = new Date(iso);
   return date.toLocaleString("en-GB", {
