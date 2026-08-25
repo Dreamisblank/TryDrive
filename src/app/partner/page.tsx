@@ -42,7 +42,7 @@ export default function PartnerPage() {
 
         <div className="mt-10 rounded-3xl border border-orange-900/5 bg-white/90 p-8 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Interested in listing your fleet?
+            Get in contact
           </p>
           <a
             href="mailto:help@trydrive.co.uk"
