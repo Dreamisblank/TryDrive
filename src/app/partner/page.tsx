@@ -36,11 +36,8 @@ export default function PartnerPage() {
         </p>
 
         <p className="mt-4 leading-relaxed text-slate-600">
-          What makes it different: every visitor on TryDrive has already
-          entered a pickup location, dates, and driver details before they
-          see a single price, so there&apos;s no wasted traffic. We only earn
-          when you get a booking, which keeps our incentives lined up with
-          yours.
+          We only earn when you get a booking, which keeps our incentives
+          lined up with yours.
         </p>
 
         <div className="mt-10 rounded-3xl border border-orange-900/5 bg-white/90 p-8 shadow-sm">
