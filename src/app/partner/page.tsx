@@ -16,7 +16,7 @@ export default function PartnerPage() {
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-2xl px-6 pt-4 pb-24 text-center">
+      <main className="mx-auto max-w-4xl px-6 pt-4 pb-24 text-center">
         <Link
           href="/"
           className="text-sm font-medium text-orange-700 hover:text-orange-800"
