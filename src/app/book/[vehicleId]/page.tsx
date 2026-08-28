@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import BookingForm from "@/components/BookingForm";
 import { getVehicleDetails } from "@/lib/rentsyst";
+import { getSelectedCurrency } from "@/lib/currencyServer";
 
 type BookPageProps = {
   params: Promise<{ vehicleId: string }>;
@@ -43,6 +44,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
         pickupDate: pickupDate!,
         dropoffDate: dropoffDate!,
         driverAge: parsedAge,
+        currency: await getSelectedCurrency(),
       });
     } catch (err) {
       console.error("Vehicle lookup failed:", err);

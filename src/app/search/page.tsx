@@ -3,6 +3,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import SearchResults from "@/components/SearchResults";
 import { searchVehicles } from "@/lib/rentsyst";
+import { getSelectedCurrency } from "@/lib/currencyServer";
 
 type SearchPageProps = {
   searchParams: Promise<{
@@ -30,6 +31,7 @@ export default async function SearchResultsPage({
         pickupDate: pickupDate!,
         dropoffDate: dropoffDate!,
         driverAge: parsedAge,
+        currency: await getSelectedCurrency(),
       });
     } catch (err) {
       console.error("RentSyst search failed:", err);

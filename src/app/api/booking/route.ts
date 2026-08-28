@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { createBooking, getOrderTotal } from "@/lib/rentsyst";
+import { getSelectedCurrency } from "@/lib/currencyServer";
+import { getCurrentUser } from "@/lib/supabase/server";
+import { isAuthConfigured } from "@/lib/supabase/config";
 import { appendBookingLog } from "@/lib/bookingLog";
 
 type BookingRequestBody = {
@@ -34,6 +37,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
+  // Enforce sign-in on the server too: the client-side gate is only UX, and a
+  // POST here creates a real order. Skipped entirely while Supabase is
+  // unconfigured so the site keeps working as it did before auth existed.
+  if (isAuthConfigured()) {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Please sign in to complete your booking." },
+        { status: 401 },
+      );
+    }
+  }
+
   const driver = body.driver;
   const missing: string[] = [];
   if (!body.vehicleId) missing.push("vehicleId");
@@ -63,6 +79,9 @@ export async function POST(request: Request) {
       pickupDatetime: body.pickupDatetime!,
       returnDatetime: body.returnDatetime!,
       insuranceId: body.insuranceId ? Number(body.insuranceId) : undefined,
+      // Read server-side from the same cookie that priced the quote, rather
+      // than trusting a currency supplied by the client.
+      currency: await getSelectedCurrency(),
       driver: {
         firstName: driver!.firstName,
         lastName: driver!.lastName,

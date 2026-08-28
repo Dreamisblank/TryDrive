@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TryDrive
 
-## Getting Started
+Car rental search and booking, built on Next.js 16 (App Router) and the
+RentSyst Aggregator API. Deployed on Hostinger from `main`.
 
-First, run the development server:
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Build with `npm run build`, which uses `--webpack` on purpose: Turbopack's
+> native binary crashes on Hostinger's glibc, and plain SWC has a WASM
+> fallback.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set these in `.env.local` for development, and in Hostinger's hPanel
+(Advanced → Environment Variables) for production. **Changes only take effect
+after the Node process restarts.**
 
-## Learn More
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `RENTSYST_CLIENT_ID` | yes | RentSyst Aggregator API credentials |
+| `RENTSYST_CLIENT_SECRET` | yes | " |
+| `ADMIN_PASSWORD` | yes | Gates `/admin` |
+| `NEXT_PUBLIC_SUPABASE_URL` | no | Enables sign-in |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | no | " |
 
-To learn more about Next.js, take a look at the following resources:
+Auth is optional by design: with the two Supabase variables unset, the Sign in
+button is hidden and booking is not gated, so the site behaves exactly as it
+did before auth existed. Set both to switch it on.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Never put the Supabase `service_role` key here — it bypasses row-level
+security and `NEXT_PUBLIC_` variables are shipped to the browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Enabling sign-in
 
-## Deploy on Vercel
+1. Create a project at [supabase.com](https://supabase.com). From
+   **Project Settings → API**, copy the **Project URL** and the **anon /
+   public** key into the two variables above.
+2. In **Authentication → URL Configuration**, set the Site URL to
+   `https://trydrive.co.uk` and add these redirect URLs:
+   - `https://trydrive.co.uk/auth/callback`
+   - `http://localhost:3000/auth/callback`
+3. **Google** — in **Authentication → Providers → Google**, enable it and paste
+   a Client ID and Secret from a Google Cloud OAuth 2.0 credential. That
+   credential's authorised redirect URI must be the callback URL Supabase
+   shows on that page (`https://<project>.supabase.co/auth/v1/callback`), not
+   TryDrive's own.
+4. **Email** — enabled by default; magic links work with no extra setup. The
+   built-in mailer is rate-limited, so add SMTP under **Project Settings →
+   Auth** before real traffic.
+5. **Phone** — under **Authentication → Providers → Phone**, enable it and
+   connect an SMS provider (Twilio, MessageBird, Vonage). This costs roughly a
+   penny per message and needs an account with that provider. Until it's
+   configured the phone option returns an error; Google and email still work.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Currency
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The header picker writes a `trydrive_currency` cookie, which the server reads
+when calling RentSyst. Prices are always rendered in whatever currency
+RentSyst returns rather than converted client-side, so an unsupported code
+degrades to their default instead of mislabelling numbers. First-time visitors
+are guessed from their browser locale, then timezone.
+
+## Admin
+
+`/admin` is password-gated via `src/proxy.ts` and deliberately unlinked from
+the public site. It shows RentSyst connectivity and a local booking log
+(`data/bookings.jsonl`), which is a flat file that resets on redeploy —
+RentSyst has no "list all bookings" endpoint.
+
+## Notes
+
+- Next.js 16 renamed `middleware.ts` to `proxy.ts` (function `middleware` →
+  `proxy`), and it runs on the Node runtime by default.
+- Hostinger sits behind a CDN with a long `s-maxage`; purge the cache after
+  every deploy or changes won't appear.

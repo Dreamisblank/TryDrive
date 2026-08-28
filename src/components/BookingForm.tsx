@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { NormalizedVehicle } from "@/lib/rentsyst";
+import { useAuth } from "./AuthProvider";
 
 type BookingResult = { bookingId: string; totalPrice: number };
 type DriverInfo = {
@@ -64,6 +65,7 @@ export default function BookingForm({
     return idx === -1 ? null : idx;
   });
 
+  const { user, configured, openSignIn } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(
     null,
@@ -84,9 +86,8 @@ export default function BookingForm({
     [vehicle.rentalPrice, vehicle.ageSurcharge, selectedInsurance],
   );
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
     setBookingError(null);
 
     const form = new FormData(event.currentTarget);
@@ -99,6 +100,22 @@ export default function BookingForm({
       phone: String(form.get("phone") || ""),
       birthdate,
     };
+
+    // Booking requires an account. If sign-in isn't configured yet, fall
+    // through so the site keeps working exactly as it did before.
+    if (configured && !user) {
+      openSignIn(() => {
+        void submitBooking(driver, comment);
+      });
+      return;
+    }
+
+    void submitBooking(driver, comment);
+  }
+
+  async function submitBooking(driver: DriverInfo, comment: string) {
+    setSubmitting(true);
+    setBookingError(null);
 
     try {
       const response = await fetch("/api/booking", {
@@ -388,7 +405,11 @@ export default function BookingForm({
           disabled={submitting}
           className="mt-4 w-full rounded-full bg-orange-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:opacity-60 sm:w-auto"
         >
-          {submitting ? "Booking…" : `Confirm booking — ${c}${total.toFixed(2)}`}
+          {submitting
+            ? "Booking…"
+            : configured && !user
+              ? `Sign in to book — ${c}${total.toFixed(2)}`
+              : `Confirm booking — ${c}${total.toFixed(2)}`}
         </button>
       </form>
     </div>

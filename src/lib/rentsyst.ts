@@ -138,6 +138,13 @@ export type SearchVehiclesParams = {
   pickupDate: string;
   dropoffDate: string;
   driverAge: number;
+  /**
+   * ISO code, lowercased for the API. RentSyst is the source of truth: it
+   * echoes back the currency it actually priced in, and we render that, so an
+   * unsupported code falls back to their default instead of mislabelling
+   * prices.
+   */
+  currency?: string;
 };
 
 export type SearchVehiclesResult = {
@@ -248,7 +255,7 @@ export async function searchVehicles(
     order_by: "price",
     pickup_delivery: "0",
     return_delivery: "0",
-    currency: "eur",
+    currency: (params.currency ?? "EUR").toLowerCase(),
   });
 
   const response = await fetch(`${RATES_URL}?${query.toString()}`, {
@@ -317,7 +324,7 @@ export async function getVehicleDetails(
     return_datetime: `${params.dropoffDate} 10:00:00`,
     pickup_delivery: "0",
     return_delivery: "0",
-    currency: "eur",
+    currency: (params.currency ?? "EUR").toLowerCase(),
   });
 
   const response = await fetch(
@@ -357,6 +364,8 @@ export type CreateBookingParams = {
   pickupDatetime: string; // "YYYY-MM-DD HH:mm:ss"
   returnDatetime: string;
   insuranceId?: number;
+  /** Must match the currency the quote was shown in. */
+  currency?: string;
   driver: {
     firstName: string;
     lastName: string;
@@ -399,7 +408,7 @@ export async function createBooking(
   }
   form.set("pickup_delivery", "0");
   form.set("return_delivery", "0");
-  form.set("currency", "eur");
+  form.set("currency", (params.currency ?? "EUR").toLowerCase());
 
   const response = await fetch(BOOKING_URL, {
     method: "POST",
