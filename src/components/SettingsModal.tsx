@@ -459,13 +459,11 @@ function NotificationsPanel() {
 const THEME_OPTIONS: { id: ThemePreference; label: string }[] = [
   { id: "light", label: "Light" },
   { id: "dark", label: "Dark" },
-  { id: "auto", label: "Sunset" },
-  { id: "system", label: "System" },
 ];
 
 function SettingsPanel() {
   const { user, signOut } = useAuth();
-  const { preference, resolved, setPreference } = useTheme();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -513,9 +511,7 @@ function SettingsPanel() {
           <div className="flex-1">
             <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Theme</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {preference === "auto"
-                ? `Following your local sunset — currently ${resolved}.`
-                : "How TryDrive looks on this device."}
+              How TryDrive looks on this device.
             </p>
           </div>
           <div className="flex rounded-full bg-slate-100 p-0.5 dark:bg-slate-800">
@@ -523,9 +519,9 @@ function SettingsPanel() {
               <button
                 key={opt.id}
                 type="button"
-                onClick={() => setPreference(opt.id)}
+                onClick={() => setTheme(opt.id)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  preference === opt.id
+                  theme === opt.id
                     ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
                     : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}

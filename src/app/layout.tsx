@@ -29,25 +29,11 @@ export const viewport: Viewport = {
   ],
 };
 
-/**
- * Runs before first paint to avoid a white flash on a dark-mode load. It only
- * replays the theme resolved on the previous visit; ThemeProvider re-runs the
- * real sunset calculation once React is up and corrects it if needed.
- */
+/** Runs before first paint to avoid a white flash on a dark-mode load. */
 const themeBootScript = `
 (function () {
   try {
-    var pref = localStorage.getItem("trydrive_theme") || "auto";
-    var dark;
-    if (pref === "dark") dark = true;
-    else if (pref === "light") dark = false;
-    else {
-      var last = localStorage.getItem("trydrive_theme_resolved");
-      dark = last
-        ? last === "dark"
-        : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    if (dark) {
+    if (localStorage.getItem("trydrive_theme") === "dark") {
       document.documentElement.classList.add("dark");
       document.documentElement.style.colorScheme = "dark";
     }
