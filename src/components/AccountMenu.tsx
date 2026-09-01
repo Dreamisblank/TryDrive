@@ -73,13 +73,18 @@ function Avatar({
   initial: string;
   className: string;
 }) {
-  if (url) {
+  // Google's avatar URLs can fail (expired link, blocked hotlink, offline).
+  // Fall back to the initial rather than leaving an empty circle.
+  const [failed, setFailed] = useState(false);
+
+  if (url && !failed) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={url}
         alt=""
         referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
         className={`${className} object-cover`}
       />
     );
