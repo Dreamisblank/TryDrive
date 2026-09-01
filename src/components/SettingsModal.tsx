@@ -110,7 +110,10 @@ export default function SettingsModal({
         </nav>
 
         {/* Panel */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Extra top padding (vs. the p-6 used on the other sides) clears
+            the close button below, which sits at top-3 - without it, the
+            first row of content overlapped the button's hitbox. */}
+        <div className="flex-1 overflow-y-auto px-6 pt-14 pb-6">
           {tab === "account" && <AccountPanel onGoToDetails={() => setTab("details")} />}
           {tab === "details" && <DetailsPanel />}
           {tab === "notifications" && <NotificationsPanel />}
@@ -122,7 +125,7 @@ export default function SettingsModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+          className="absolute top-3 right-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
         >
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
             <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
