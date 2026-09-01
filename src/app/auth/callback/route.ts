@@ -2,11 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * Where Google OAuth and email magic links land. Supabase hands back a `code`
- * which we exchange for a session cookie, then bounce the user to wherever
- * they were before signing in.
- */
-/**
  * The public origin of this request.
  *
  * Deliberately not `request.nextUrl.origin`: that resolves to the address the
@@ -27,6 +22,20 @@ function resolveOrigin(request: NextRequest): string {
   return `${proto}://${host}`;
 }
 
+function errorRedirect(origin: string, safeNext: string, detail: string) {
+  // Logged here too, since Hostinger's logs are the only place this is
+  // visible if the user never reports the banner text.
+  console.error("Auth callback failed:", detail);
+  const url = new URL(safeNext, origin);
+  url.searchParams.set("auth_error", detail);
+  return NextResponse.redirect(url);
+}
+
+/**
+ * Where Google OAuth and email magic links land. Supabase hands back a `code`
+ * which we exchange for a session cookie, then bounce the user to wherever
+ * they were before signing in.
+ */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const origin = resolveOrigin(request);
@@ -37,21 +46,27 @@ export async function GET(request: NextRequest) {
   // open redirect.
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
+  // Supabase/Google can land here with an explicit error instead of a code
+  // (e.g. the user cancelled, or this redirect URL isn't on Supabase's
+  // allow-list), so surface that rather than a generic "missing code".
+  const providerError = searchParams.get("error_description") ?? searchParams.get("error");
+  if (providerError) {
+    return errorRedirect(origin, safeNext, providerError);
+  }
+
   if (!code) {
-    return NextResponse.redirect(`${origin}${safeNext}?auth_error=missing_code`);
+    return errorRedirect(origin, safeNext, "No authorization code was returned.");
   }
 
   const supabase = await getSupabaseServerClient();
   if (!supabase) {
-    return NextResponse.redirect(
-      `${origin}${safeNext}?auth_error=not_configured`,
-    );
+    return errorRedirect(origin, safeNext, "Sign-in isn't configured on the server.");
   }
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(`${origin}${safeNext}?auth_error=exchange`);
+    return errorRedirect(origin, safeNext, error.message);
   }
 
-  return NextResponse.redirect(`${origin}${safeNext}`);
+  return NextResponse.redirect(new URL(safeNext, origin));
 }

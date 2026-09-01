@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import AuthErrorBanner from "@/components/AuthErrorBanner";
 import AuthProvider from "@/components/AuthProvider";
 import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
@@ -70,7 +71,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {themeBootScript}
         </Script>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <AuthErrorBanner />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
