@@ -19,29 +19,29 @@ export default function PartnerPage() {
       <main className="mx-auto max-w-4xl px-6 pt-4 pb-24 text-center">
         <Link
           href="/"
-          className="text-sm font-medium text-orange-700 hover:text-orange-800"
+          className="text-sm font-medium text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
         >
           ← Back to TryDrive
         </Link>
 
-        <h1 className="mt-8 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mt-8 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl">
           Partner with us
         </h1>
 
-        <p className="mt-6 leading-relaxed text-slate-600">
+        <p className="mt-6 leading-relaxed text-slate-600 dark:text-slate-300">
           TryDrive connects car rental companies with travellers who are
           already comparing prices for specific dates and locations, ready to
           book. Listing your fleet with us is a simple way to pick up extra
           reservations without running your own marketing.
         </p>
 
-        <p className="mt-4 leading-relaxed text-slate-600">
+        <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-300">
           We only earn when you get a booking, which keeps our incentives
           lined up with yours.
         </p>
 
-        <div className="mt-10 rounded-3xl border border-orange-900/5 bg-white/90 p-8 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">
+        <div className="mt-10 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-8 shadow-sm">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
             Get in contact
           </p>
           <a

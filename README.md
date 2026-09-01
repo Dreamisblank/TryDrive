@@ -40,6 +40,12 @@ security and `NEXT_PUBLIC_` variables are shipped to the browser.
 1. Create a project at [supabase.com](https://supabase.com). From
    **Project Settings → API**, copy the **Project URL** and the **anon /
    public** key into the two variables above.
+1. Open **SQL Editor → New query**, paste the contents of
+   [`supabase/schema.sql`](supabase/schema.sql) and run it. This creates the
+   `profiles` and `bookings` tables, their row-level-security policies, the
+   trigger that gives every new user a profile, and the function behind
+   "Delete account". It is safe to re-run. Without it, sign-in still works but
+   Settings and the Cars page have nowhere to read from.
 2. In **Authentication → URL Configuration**, set the Site URL to
    `https://trydrive.co.uk` and add these redirect URLs:
    - `https://trydrive.co.uk/auth/callback`

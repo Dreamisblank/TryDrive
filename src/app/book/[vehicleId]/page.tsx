@@ -63,15 +63,15 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
       <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
         <Link
           href={backToResultsHref}
-          className="text-sm font-medium text-orange-700 hover:text-orange-800"
+          className="text-sm font-medium text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
         >
           ← Back to results
         </Link>
 
         {!hasValidParams && (
-          <div className="mt-8 rounded-3xl border border-dashed border-orange-300 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm">
+          <div className="mt-8 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-slate-500 dark:text-slate-400 backdrop-blur-sm">
             Missing search details.{" "}
-            <Link href="/" className="text-orange-700 hover:text-orange-800">
+            <Link href="/" className="text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300">
               Start a new search
             </Link>
             .
@@ -79,19 +79,19 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
         )}
 
         {hasValidParams && error && (
-          <div className="mt-8 rounded-3xl border border-dashed border-red-300 bg-white/70 p-10 text-center text-red-600 backdrop-blur-sm">
+          <div className="mt-8 rounded-3xl border border-dashed border-red-300 dark:border-red-900/50 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-red-600 dark:text-red-400 backdrop-blur-sm">
             {error}
           </div>
         )}
 
         {hasValidParams && !error && !result && (
-          <div className="mt-8 rounded-3xl border border-dashed border-orange-300 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm">
+          <div className="mt-8 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-slate-500 dark:text-slate-400 backdrop-blur-sm">
             This vehicle isn&apos;t available for these dates anymore.
           </div>
         )}
 
         {hasValidParams && !error && result && !result.eligible && (
-          <div className="mt-8 rounded-3xl border border-dashed border-red-300 bg-white/70 p-10 text-center text-red-600 backdrop-blur-sm">
+          <div className="mt-8 rounded-3xl border border-dashed border-red-300 dark:border-red-900/50 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-red-600 dark:text-red-400 backdrop-blur-sm">
             Driver age {parsedAge} is below the minimum age (
             {result.vehicle.minDriverAge}+) required for this vehicle.
           </div>

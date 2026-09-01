@@ -11,17 +11,17 @@ export const metadata: Metadata = {
 
 function H2({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mt-8 text-lg font-semibold text-slate-900">{children}</h2>
+    <h2 className="mt-8 text-lg font-semibold text-slate-900 dark:text-slate-100">{children}</h2>
   );
 }
 
 function P({ children }: { children: React.ReactNode }) {
-  return <p className="mt-3 leading-relaxed text-slate-600">{children}</p>;
+  return <p className="mt-3 leading-relaxed text-slate-600 dark:text-slate-300">{children}</p>;
 }
 
 function UL({ children }: { children: React.ReactNode }) {
   return (
-    <ul className="mt-3 list-disc space-y-1.5 pl-5 leading-relaxed text-slate-600">
+    <ul className="mt-3 list-disc space-y-1.5 pl-5 leading-relaxed text-slate-600 dark:text-slate-300">
       {children}
     </ul>
   );
@@ -36,15 +36,15 @@ export default function TermsOfServicePage() {
       <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
         <Link
           href="/"
-          className="text-sm font-medium text-orange-700 hover:text-orange-800"
+          className="text-sm font-medium text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
         >
           ← Back to TryDrive
         </Link>
 
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           Terms of Service
         </h1>
-        <p className="mt-2 text-sm text-slate-500">Last updated: 17/08/2026</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Last updated: 17/08/2026</p>
 
         <H2>1. About TryDrive</H2>
         <P>
@@ -180,7 +180,7 @@ export default function TermsOfServicePage() {
           For questions about these Terms, contact:{" "}
           <a
             href="mailto:help@trydrive.co.uk"
-            className="text-orange-700 hover:text-orange-800"
+            className="text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
           >
             help@trydrive.co.uk
           </a>

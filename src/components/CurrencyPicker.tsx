@@ -86,7 +86,7 @@ export default function CurrencyPicker() {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Currency: ${active.label}`}
-        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"
+        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-white/70 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white"
       >
         <span>{active.symbol}</span>
         <span>{active.code}</span>
@@ -103,7 +103,7 @@ export default function CurrencyPicker() {
       {open && (
         <ul
           role="listbox"
-          className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-orange-900/5 bg-white py-1.5 shadow-xl"
+          className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-orange-900/5 dark:border-slate-700/60 bg-white dark:bg-slate-900 py-1.5 shadow-xl"
         >
           {CURRENCIES.map((currency) => (
             <li key={currency.code}>
@@ -112,15 +112,15 @@ export default function CurrencyPicker() {
                 role="option"
                 aria-selected={currency.code === current}
                 onClick={() => choose(currency.code)}
-                className={`flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition hover:bg-orange-50 ${
+                className={`flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition hover:bg-orange-50 dark:hover:bg-orange-950/40 ${
                   currency.code === current
-                    ? "font-semibold text-orange-700"
-                    : "text-slate-700"
+                    ? "font-semibold text-orange-700 dark:text-orange-400"
+                    : "text-slate-700 dark:text-slate-200"
                 }`}
               >
                 <span className="w-8 shrink-0">{currency.symbol}</span>
                 <span className="flex-1">{currency.label}</span>
-                <span className="text-xs text-slate-400">{currency.code}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{currency.code}</span>
               </button>
             </li>
           ))}

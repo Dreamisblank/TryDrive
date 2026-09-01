@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createBooking, getOrderTotal } from "@/lib/rentsyst";
 import { getSelectedCurrency } from "@/lib/currencyServer";
-import { getCurrentUser } from "@/lib/supabase/server";
+import { getCurrentUser, getSupabaseServerClient } from "@/lib/supabase/server";
 import { isAuthConfigured } from "@/lib/supabase/config";
 import { appendBookingLog } from "@/lib/bookingLog";
 
@@ -15,6 +15,8 @@ type BookingRequestBody = {
   vehicleName?: string;
   totalPrice?: number;
   currencySymbol?: string;
+  insuranceName?: string;
+  pickupLocation?: string;
   driver: {
     firstName: string;
     lastName: string;
@@ -40,8 +42,9 @@ export async function POST(request: Request) {
   // Enforce sign-in on the server too: the client-side gate is only UX, and a
   // POST here creates a real order. Skipped entirely while Supabase is
   // unconfigured so the site keeps working as it did before auth existed.
+  let user: Awaited<ReturnType<typeof getCurrentUser>> = null;
   if (isAuthConfigured()) {
-    const user = await getCurrentUser();
+    user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
         { error: "Please sign in to complete your booking." },
@@ -114,6 +117,31 @@ export async function POST(request: Request) {
       driverEmail: driver!.email,
       cabinetUrl: result.cabinetUrl,
     });
+
+    // Save it against the user so it shows up on their Cars page. RLS means
+    // this insert only succeeds for their own row. Never fail the request over
+    // this: the booking with RentSyst already succeeded.
+    if (user) {
+      const supabase = await getSupabaseServerClient();
+      const { error } = (await supabase?.from("bookings").insert({
+        user_id: user.id,
+        booking_ref: result.bookingId,
+        rentsyst_client_id: result.clientId,
+        vehicle_id: Number(body.vehicleId),
+        vehicle_name: body.vehicleName ?? null,
+        pickup_location: body.pickupLocation ?? null,
+        pickup_datetime: body.pickupDatetime?.replace(" ", "T"),
+        return_datetime: body.returnDatetime?.replace(" ", "T"),
+        insurance_name: body.insuranceName ?? null,
+        total_price: totalPrice,
+        currency: await getSelectedCurrency(),
+        cabinet_url: result.cabinetUrl,
+      })) ?? { error: null };
+
+      if (error) {
+        console.error("Failed to save booking to Supabase:", error.message);
+      }
+    }
 
     return NextResponse.json({ ...result, totalPrice });
   } catch (err) {

@@ -12,10 +12,14 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isAuthConfigured } from "@/lib/supabase/config";
+import { fetchProfile, type Profile } from "@/lib/profile";
 import AuthModal from "./AuthModal";
 
 type AuthContextValue = {
   user: User | null;
+  profile: Profile | null;
+  /** Re-reads the profile row, e.g. after saving in Settings. */
+  refreshProfile: () => Promise<void>;
   loading: boolean;
   /** False until the Supabase env vars are set; callers should not gate on auth. */
   configured: boolean;
@@ -41,6 +45,7 @@ export default function AuthProvider({
   // Resolved on the client so that pages using this provider stay statically
   // prerenderable; the Supabase browser client reads the session from cookies.
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(configured);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -75,6 +80,30 @@ export default function AuthProvider({
     };
   }, []);
 
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !user) {
+      // Clearing state because the thing we read from (a signed-in
+      // session) has gone away - the case this rule exempts.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setProfile(null);
+      return;
+    }
+    let active = true;
+    fetchProfile(supabase, user.id).then((p) => {
+      if (active) setProfile(p);
+    });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const refreshProfile = useCallback(async () => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !user) return;
+    setProfile(await fetchProfile(supabase, user.id));
+  }, [user]);
+
   const openSignIn = useCallback((onSuccess?: () => void) => {
     onSuccessRef.current = onSuccess ?? null;
     setModalOpen(true);
@@ -98,12 +127,21 @@ export default function AuthProvider({
     setLoading(true);
     await supabase.auth.signOut();
     setUser(null);
+    setProfile(null);
     setLoading(false);
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, configured, openSignIn, signOut }),
-    [user, loading, configured, openSignIn, signOut],
+    () => ({
+      user,
+      profile,
+      refreshProfile,
+      loading,
+      configured,
+      openSignIn,
+      signOut,
+    }),
+    [user, profile, refreshProfile, loading, configured, openSignIn, signOut],
   );
 
   return (
