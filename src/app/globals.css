@@ -78,43 +78,6 @@ body {
   background-size: 9px 9px, 100% 100%;
 }
 
-/* Car driving across the sign-in modal's banner, looping continuously.
-   Percentage-based left/keyframes so it scales with the banner's own width
-   rather than a fixed pixel distance. */
-.auth-modal-car-wrap {
-  position: absolute;
-  top: 50%;
-  left: -16%;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  transform: translateY(-50%);
-  animation: auth-modal-drive 6s linear infinite;
-}
-
-.auth-modal-trail {
-  height: 3px;
-  border-radius: 999px;
-  background: #ea580c;
-}
-
-@keyframes auth-modal-drive {
-  from {
-    left: -16%;
-  }
-  to {
-    left: 116%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-modal-car-wrap {
-    animation: none;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
 /* Native date/number spinners and pickers render black-on-black otherwise. */
 .dark input[type="date"]::-webkit-calendar-picker-indicator,
 .dark input[type="number"]::-webkit-inner-spin-button {
