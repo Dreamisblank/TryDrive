@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-const DEMO_LOCATION_LABEL = "Larnaca, Cyprus (Demo)";
+import { useMemo, useState } from "react";
+import type { RentSystLocation } from "@/lib/rentsyst";
 
 // Local calendar date (not toISOString, which shifts to UTC and can land
 // on the wrong day depending on the browser's timezone offset).
@@ -95,11 +94,28 @@ function SearchIcon() {
   );
 }
 
-export default function CarSearchForm() {
+export default function CarSearchForm({
+  locations,
+}: {
+  locations: RentSystLocation[];
+}) {
   const router = useRouter();
   const [pickupDate, setPickupDate] = useState(earliestPickupIso());
   const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
   const [driverAge, setDriverAge] = useState("25");
+  const [locationId, setLocationId] = useState(() =>
+    locations[0] ? String(locations[0].id) : "",
+  );
+
+  const locationsByCompany = useMemo(() => {
+    const groups = new Map<string, RentSystLocation[]>();
+    for (const loc of locations) {
+      const group = groups.get(loc.companyName) ?? [];
+      group.push(loc);
+      groups.set(loc.companyName, group);
+    }
+    return Array.from(groups.entries());
+  }, [locations]);
 
   function handlePickupDateChange(nextPickupDate: string) {
     setPickupDate(nextPickupDate);
@@ -111,8 +127,14 @@ export default function CarSearchForm() {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const selected = locations.find((loc) => String(loc.id) === locationId);
+    if (!selected) return;
+
     const params = new URLSearchParams({
-      location: DEMO_LOCATION_LABEL,
+      location: selected.name,
+      locationId: String(selected.id),
+      lat: String(selected.latitude),
+      lng: String(selected.longitude),
       pickupDate,
       dropoffDate,
       driverAge,
@@ -129,7 +151,11 @@ export default function CarSearchForm() {
 
     // Let the background globe zoom into the search location before
     // navigating, rather than cutting away mid-animation.
-    window.dispatchEvent(new CustomEvent("trydrive:zoom-search"));
+    window.dispatchEvent(
+      new CustomEvent("trydrive:zoom-search", {
+        detail: { lat: selected.latitude, lng: selected.longitude },
+      }),
+    );
     setTimeout(() => router.push(destination), 650);
   }
 
@@ -147,10 +173,24 @@ export default function CarSearchForm() {
           <select
             id="pickupLocation"
             name="pickupLocation"
-            defaultValue={DEMO_LOCATION_LABEL}
-            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 dark:text-neutral-100 outline-none"
+            value={locationId}
+            onChange={(event) => setLocationId(event.target.value)}
+            disabled={locations.length === 0}
+            required
+            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 dark:text-neutral-100 outline-none disabled:cursor-not-allowed"
           >
-            <option value={DEMO_LOCATION_LABEL}>{DEMO_LOCATION_LABEL}</option>
+            {locations.length === 0 && (
+              <option value="">No locations available</option>
+            )}
+            {locationsByCompany.map(([companyName, companyLocations]) => (
+              <optgroup key={companyName} label={companyName}>
+                {companyLocations.map((loc) => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
           </select>
         </label>
 
@@ -209,7 +249,8 @@ export default function CarSearchForm() {
         <div className="flex items-center justify-center p-1.5 sm:pl-1.5">
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700 sm:w-auto"
+            disabled={locations.length === 0}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <SearchIcon />
             Search

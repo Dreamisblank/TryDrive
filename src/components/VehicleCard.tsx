@@ -6,17 +6,23 @@ export default function VehicleCard({
   driverAge,
   pickupDate,
   dropoffDate,
+  location,
 }: {
   vehicle: NormalizedVehicle;
   driverAge: number;
   pickupDate: string;
   dropoffDate: string;
+  location: { id: number; name: string; lat: number; lng: number };
 }) {
   const c = vehicle.currencySymbol;
   const bookHref = `/book/${vehicle.id}?${new URLSearchParams({
     pickupDate,
     dropoffDate,
     driverAge: String(driverAge),
+    location: location.name,
+    locationId: String(location.id),
+    lat: String(location.lat),
+    lng: String(location.lng),
   }).toString()}`;
 
   return (

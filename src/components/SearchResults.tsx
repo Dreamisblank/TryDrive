@@ -4,18 +4,22 @@ import { useState } from "react";
 import type { NormalizedVehicle } from "@/lib/rentsyst";
 import VehicleCard from "@/components/VehicleCard";
 
+type LocationInfo = { id: number; name: string; lat: number; lng: number };
+
 export default function SearchResults({
   vehicles,
   categories,
   driverAge,
   pickupDate,
   dropoffDate,
+  location,
 }: {
   vehicles: NormalizedVehicle[];
   categories: string[];
   driverAge: number;
   pickupDate: string;
   dropoffDate: string;
+  location: LocationInfo;
 }) {
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
 
@@ -67,6 +71,7 @@ export default function SearchResults({
               driverAge={driverAge}
               pickupDate={pickupDate}
               dropoffDate={dropoffDate}
+              location={location}
             />
           ))}
         </div>

@@ -12,24 +12,38 @@ type BookPageProps = {
     pickupDate?: string;
     dropoffDate?: string;
     driverAge?: string;
+    location?: string;
+    locationId?: string;
+    lat?: string;
+    lng?: string;
   }>;
 };
 
 export default async function BookPage({ params, searchParams }: BookPageProps) {
   const { vehicleId } = await params;
-  const { pickupDate, dropoffDate, driverAge } = await searchParams;
+  const { pickupDate, dropoffDate, driverAge, location, locationId, lat, lng } =
+    await searchParams;
   const parsedAge = Number(driverAge);
   const parsedVehicleId = Number(vehicleId);
+  const parsedLocationId = Number(locationId);
+  const parsedLat = Number(lat);
+  const parsedLng = Number(lng);
 
   const hasValidParams =
     Number.isFinite(parsedVehicleId) &&
     pickupDate &&
     dropoffDate &&
     Number.isFinite(parsedAge) &&
-    parsedAge > 0;
+    parsedAge > 0 &&
+    Number.isFinite(parsedLocationId) &&
+    Number.isFinite(parsedLat) &&
+    Number.isFinite(parsedLng);
 
   const backToResultsHref = `/search?${new URLSearchParams({
-    location: "Larnaca, Cyprus (Demo)",
+    location: location ?? "",
+    locationId: locationId ?? "",
+    lat: lat ?? "",
+    lng: lng ?? "",
     pickupDate: pickupDate ?? "",
     dropoffDate: dropoffDate ?? "",
     driverAge: driverAge ?? "",
@@ -44,6 +58,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
         pickupDate: pickupDate!,
         dropoffDate: dropoffDate!,
         driverAge: parsedAge,
+        location: { id: parsedLocationId, latitude: parsedLat, longitude: parsedLng },
         currency: await getSelectedCurrency(),
       });
     } catch (err) {
@@ -51,7 +66,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
       const message = err instanceof Error ? err.message : "";
       error = message.startsWith("RentSyst")
         ? message
-        : "Couldn't reach the RentSyst demo API. Please try again.";
+        : "Couldn't reach the RentSyst API. Please try again.";
     }
   }
 
@@ -103,6 +118,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
             driverAge={parsedAge}
             pickupDate={pickupDate!}
             dropoffDate={dropoffDate!}
+            pickupLocationLabel={location || "—"}
           />
         )}
       </main>

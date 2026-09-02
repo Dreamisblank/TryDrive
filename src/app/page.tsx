@@ -4,8 +4,16 @@ import HeroHeadline from "@/components/HeroHeadline";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
+import { getLocations } from "@/lib/rentsyst";
 
-export default function Home() {
+export default async function Home() {
+  let locations: Awaited<ReturnType<typeof getLocations>> = [];
+  try {
+    locations = await getLocations();
+  } catch (err) {
+    console.error("Failed to load RentSyst locations:", err);
+  }
+
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
       <SkyBackground />
@@ -16,11 +24,8 @@ export default function Home() {
         <HeroHeadline />
 
         <div className="mt-10 w-full">
-          <CarSearchForm />
+          <CarSearchForm locations={locations} />
         </div>
-        <p className="mt-3 text-xs text-slate-500 dark:text-neutral-400">
-          Demo mode — results limited to Larnaca, Cyprus
-        </p>
       </main>
 
       <SiteFooter />

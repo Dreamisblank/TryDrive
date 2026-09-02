@@ -8,6 +8,9 @@ import { getSelectedCurrency } from "@/lib/currencyServer";
 type SearchPageProps = {
   searchParams: Promise<{
     location?: string;
+    locationId?: string;
+    lat?: string;
+    lng?: string;
     pickupDate?: string;
     dropoffDate?: string;
     driverAge?: string;
@@ -17,10 +20,20 @@ type SearchPageProps = {
 export default async function SearchResultsPage({
   searchParams,
 }: SearchPageProps) {
-  const { location, pickupDate, dropoffDate, driverAge } = await searchParams;
+  const { location, locationId, lat, lng, pickupDate, dropoffDate, driverAge } =
+    await searchParams;
   const parsedAge = Number(driverAge);
+  const parsedLocationId = Number(locationId);
+  const parsedLat = Number(lat);
+  const parsedLng = Number(lng);
   const hasValidParams =
-    pickupDate && dropoffDate && Number.isFinite(parsedAge) && parsedAge > 0;
+    pickupDate &&
+    dropoffDate &&
+    Number.isFinite(parsedAge) &&
+    parsedAge > 0 &&
+    Number.isFinite(parsedLocationId) &&
+    Number.isFinite(parsedLat) &&
+    Number.isFinite(parsedLng);
 
   let results: Awaited<ReturnType<typeof searchVehicles>> | null = null;
   let error: string | null = null;
@@ -31,6 +44,7 @@ export default async function SearchResultsPage({
         pickupDate: pickupDate!,
         dropoffDate: dropoffDate!,
         driverAge: parsedAge,
+        location: { id: parsedLocationId, latitude: parsedLat, longitude: parsedLng },
         currency: await getSelectedCurrency(),
       });
     } catch (err) {
@@ -38,7 +52,7 @@ export default async function SearchResultsPage({
       const message = err instanceof Error ? err.message : "";
       error = message.startsWith("RentSyst")
         ? message
-        : "Couldn't reach the RentSyst demo API. Please try again.";
+        : "Couldn't reach the RentSyst API. Please try again.";
     }
   }
 
@@ -71,10 +85,9 @@ export default async function SearchResultsPage({
         </dl>
 
         <p className="mt-4 text-sm text-slate-500 dark:text-neutral-400">
-          Demo mode — results limited to Larnaca, Cyprus regardless of the
-          pickup location entered. Insurance prices are flat (not age-based);
-          where a young-driver fee applies to your age, it&apos;s added to the
-          total and shown on the card.
+          Insurance prices are flat (not age-based); where a young-driver fee
+          applies to your age, it&apos;s added to the total and shown on the
+          card.
         </p>
 
         {!hasValidParams && (
@@ -101,7 +114,7 @@ export default async function SearchResultsPage({
 
             {results.vehicles.length === 0 ? (
               <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
-                No vehicles available for these dates in the demo inventory.
+                No vehicles available for these dates at this location.
               </div>
             ) : (
               <div className="mt-8">
@@ -111,6 +124,12 @@ export default async function SearchResultsPage({
                   driverAge={parsedAge}
                   pickupDate={pickupDate!}
                   dropoffDate={dropoffDate!}
+                  location={{
+                    id: parsedLocationId,
+                    name: location ?? "",
+                    lat: parsedLat,
+                    lng: parsedLng,
+                  }}
                 />
               </div>
             )}

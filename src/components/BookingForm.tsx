@@ -38,11 +38,13 @@ export default function BookingForm({
   driverAge,
   pickupDate,
   dropoffDate,
+  pickupLocationLabel,
 }: {
   vehicle: NormalizedVehicle;
   driverAge: number;
   pickupDate: string;
   dropoffDate: string;
+  pickupLocationLabel: string;
 }) {
   const c = vehicle.currencySymbol;
   const days = Math.max(
@@ -129,7 +131,7 @@ export default function BookingForm({
           returnDatetime: `${dropoffDate} 10:00:00`,
           insuranceId: selectedInsurance?.id,
           insuranceName: selectedInsurance?.name,
-          pickupLocation: "Larnaca, Cyprus (Demo)",
+          pickupLocation: pickupLocationLabel,
           vehicleName: vehicle.name,
           totalPrice: total,
           currencySymbol: c,
@@ -161,8 +163,8 @@ export default function BookingForm({
     const rows: [string, string][] = [
       ["Reference", bookingResult.bookingId],
       ["Vehicle", vehicle.name],
-      ["Pickup", `${formatDate(pickupDate)} · Larnaca, Cyprus (Demo)`],
-      ["Return", `${formatDate(dropoffDate)} · Larnaca, Cyprus (Demo)`],
+      ["Pickup", `${formatDate(pickupDate)} · ${pickupLocationLabel}`],
+      ["Return", `${formatDate(dropoffDate)} · ${pickupLocationLabel}`],
       ["Driver", `${driverInfo.firstName} ${driverInfo.lastName}`],
       ["Email", driverInfo.email],
       ["Phone", driverInfo.phone],
@@ -249,14 +251,14 @@ export default function BookingForm({
             <div className="text-sm font-medium text-slate-900 dark:text-neutral-100">
               {formatDate(pickupDate)}
             </div>
-            <div className="text-sm text-slate-600 dark:text-neutral-300">Larnaca, Cyprus (Demo)</div>
+            <div className="text-sm text-slate-600 dark:text-neutral-300">{pickupLocationLabel}</div>
           </div>
           <div>
             <div className="text-xs font-medium text-slate-400 dark:text-neutral-500">Return</div>
             <div className="text-sm font-medium text-slate-900 dark:text-neutral-100">
               {formatDate(dropoffDate)}
             </div>
-            <div className="text-sm text-slate-600 dark:text-neutral-300">Larnaca, Cyprus (Demo)</div>
+            <div className="text-sm text-slate-600 dark:text-neutral-300">{pickupLocationLabel}</div>
           </div>
         </div>
         {vehicle.minDriverAge !== null && (

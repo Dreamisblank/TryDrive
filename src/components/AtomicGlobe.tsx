@@ -8,8 +8,9 @@ import {
   latLngToVector3,
 } from "@/lib/globeGeometry";
 
-// Demo inventory is fixed to Larnaca, Cyprus - see src/lib/rentsyst.ts.
-const SEARCH_FOCUS = { lat: 34.916, lng: 33.62 };
+// Fallback focus if a zoom request doesn't carry a location (shouldn't
+// normally happen - every search now submits a real pickup location).
+const DEFAULT_SEARCH_FOCUS = { lat: 34.916, lng: 33.62 };
 
 // Decorative flight paths between random major airports worldwide - not
 // tied to the search location. Kept broad and continent-spanning so a
@@ -184,12 +185,11 @@ export default function AtomicGlobe() {
     let zoomToRotationY = globeGroup.rotation.y;
     let zoomFromZ = camera.position.z;
 
-    function onZoomRequest() {
-      const [tx, , tz] = latLngToVector3(
-        SEARCH_FOCUS.lat,
-        SEARCH_FOCUS.lng,
-        1,
-      );
+    function onZoomRequest(event: Event) {
+      const detail = (event as CustomEvent<{ lat: number; lng: number }>)
+        .detail;
+      const focus = detail ?? DEFAULT_SEARCH_FOCUS;
+      const [tx, , tz] = latLngToVector3(focus.lat, focus.lng, 1);
       // Rotation.y (radians) that brings this point to face the camera
       // at +Z: solve tx*cos(theta) + tz*sin(theta) = 0 for the root that
       // leaves worldZ positive (facing the camera, not away from it).

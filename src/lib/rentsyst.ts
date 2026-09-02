@@ -1,16 +1,10 @@
 import "server-only";
 
 const AUTH_URL = "https://api-aggregator.rentsyst.com/oauth2/token";
+const COMPANY_URL = "https://api-aggregator.rentsyst.com/v1/company";
 const RATES_URL = "https://api-aggregator.rentsyst.com/v1/rates";
 const BOOKING_URL = "https://api-aggregator.rentsyst.com/v1/booking";
 const ORDER_VIEW_URL = "https://api-aggregator.rentsyst.com/v1/order/view";
-
-// Demo account inventory only exists around Larnaca, Cyprus.
-const DEMO_PICKUP_LOCATION = "34.916,33.620";
-// Every vehicle in the demo inventory operates out of this single location
-// (Larnaca Airport). The /v1/rates/:id endpoint 500s without an explicit
-// location id - coordinates alone aren't enough there, unlike /v1/rates.
-const DEMO_PICKUP_LOCATION_ID = "3337";
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
@@ -55,6 +49,83 @@ export async function checkRentSystConnection(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export type RentSystLocation = {
+  id: number;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  companyId: number;
+  companyName: string;
+};
+
+let cachedLocations: { value: RentSystLocation[]; expiresAt: number } | null =
+  null;
+
+/**
+ * Every pickup location across every company connected to this account.
+ * Company/location lists change rarely, so a short in-memory cache avoids
+ * re-fetching (a token exchange plus N company lookups) on every page load.
+ */
+export async function getLocations(): Promise<RentSystLocation[]> {
+  if (cachedLocations && cachedLocations.expiresAt > Date.now()) {
+    return cachedLocations.value;
+  }
+
+  const token = await getAccessToken();
+
+  const companiesResponse = await fetch(COMPANY_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!companiesResponse.ok) {
+    throw new Error(`RentSyst company list failed: ${companiesResponse.status}`);
+  }
+  const companiesBody: { data: { id: number; name: string }[] } =
+    await companiesResponse.json();
+
+  const perCompany = await Promise.all(
+    companiesBody.data.map(async (company) => {
+      const response = await fetch(`${COMPANY_URL}/${company.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (!response.ok) return [];
+
+      const body: {
+        data: {
+          company: { id: number; name: string };
+          locations: {
+            id: number;
+            name: string;
+            address: string;
+            latitude: string;
+            longitude: string;
+          }[];
+        };
+      } = await response.json();
+
+      return body.data.locations.map((loc) => ({
+        id: loc.id,
+        name: loc.name,
+        address: loc.address,
+        latitude: Number(loc.latitude),
+        longitude: Number(loc.longitude),
+        companyId: body.data.company.id,
+        companyName: body.data.company.name,
+      }));
+    }),
+  );
+
+  const locations = perCompany
+    .flat()
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  cachedLocations = { value: locations, expiresAt: Date.now() + 10 * 60 * 1000 };
+
+  return locations;
 }
 
 type RentSystOption = {
@@ -134,10 +205,18 @@ export type NormalizedVehicle = {
   returnLocationId: number;
 };
 
+export type SearchLocationParams = {
+  id: number;
+  latitude: number;
+  longitude: number;
+};
+
 export type SearchVehiclesParams = {
   pickupDate: string;
   dropoffDate: string;
   driverAge: number;
+  /** Pickup/return location, taken from getLocations(). */
+  location: SearchLocationParams;
   /**
    * ISO code, lowercased for the API. RentSyst is the source of truth: it
    * echoes back the currency it actually priced in, and we render that, so an
@@ -244,11 +323,12 @@ export async function searchVehicles(
   params: SearchVehiclesParams,
 ): Promise<SearchVehiclesResult> {
   const token = await getAccessToken();
+  const pickupLocation = `${params.location.latitude},${params.location.longitude}`;
 
   const query = new URLSearchParams({
     per_page: "20",
-    pickup_location: DEMO_PICKUP_LOCATION,
-    return_location: DEMO_PICKUP_LOCATION,
+    pickup_location: pickupLocation,
+    return_location: pickupLocation,
     pickup_datetime: `${params.pickupDate} 10:00:00`,
     return_datetime: `${params.dropoffDate} 10:00:00`,
     page: "0",
@@ -314,12 +394,14 @@ export async function getVehicleDetails(
   params: SearchVehiclesParams,
 ): Promise<VehicleDetailsResult | null> {
   const token = await getAccessToken();
+  const pickupLocation = `${params.location.latitude},${params.location.longitude}`;
+  const pickupLocationId = String(params.location.id);
 
   const query = new URLSearchParams({
-    pickup_location: DEMO_PICKUP_LOCATION,
-    return_location: DEMO_PICKUP_LOCATION,
-    pickup_location_id: DEMO_PICKUP_LOCATION_ID,
-    return_location_id: DEMO_PICKUP_LOCATION_ID,
+    pickup_location: pickupLocation,
+    return_location: pickupLocation,
+    pickup_location_id: pickupLocationId,
+    return_location_id: pickupLocationId,
     pickup_datetime: `${params.pickupDate} 10:00:00`,
     return_datetime: `${params.dropoffDate} 10:00:00`,
     pickup_delivery: "0",
