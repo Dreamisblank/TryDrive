@@ -71,6 +71,39 @@ function MailIcon() {
   );
 }
 
+// Same side-profile glyph used for the "Cars" menu item elsewhere in the
+// app, filled rather than stroked so it reads clearly at animation scale.
+function CarGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 drop-shadow-sm">
+      <path
+        d="M4 16.5l1.3-5.2a2 2 0 0 1 1.94-1.51h9.52a2 2 0 0 1 1.94 1.51l1.3 5.2v2.25a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V18.5H7v.25a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V16.5Z"
+        fill="#ea580c"
+      />
+      <circle cx="7" cy="16.5" r="1.4" fill="#7c2d12" />
+      <circle cx="17" cy="16.5" r="1.4" fill="#7c2d12" />
+    </svg>
+  );
+}
+
+/**
+ * A small car driving across the banner in a continuous loop, with a fading
+ * motion trail behind it. Percentage-based positioning so it scales with the
+ * banner's own width. Disabled under prefers-reduced-motion via the plain
+ * CSS media query in globals.css (no JS check needed for a purely decorative
+ * loop like this).
+ */
+function DrivingCar() {
+  return (
+    <div className="auth-modal-car-wrap" aria-hidden="true">
+      <span className="auth-modal-trail" style={{ width: 10, opacity: 0.18 }} />
+      <span className="auth-modal-trail" style={{ width: 14, opacity: 0.32 }} />
+      <span className="auth-modal-trail" style={{ width: 18, opacity: 0.5 }} />
+      <CarGlyph />
+    </div>
+  );
+}
+
 export default function AuthModal({
   onClose,
   onSignedIn,
@@ -218,7 +251,9 @@ export default function AuthModal({
         {/* Dots and gradient are layered in one `background-image` on purpose:
             a Tailwind gradient class here would be overwritten by the inline
             pattern, since both set the same property. */}
-        <div className="auth-modal-banner h-32 w-full" aria-hidden="true" />
+        <div className="auth-modal-banner relative h-32 w-full overflow-hidden">
+          <DrivingCar />
+        </div>
 
         <div className="px-7 pt-6 pb-7">
           {step === "providers" && (
