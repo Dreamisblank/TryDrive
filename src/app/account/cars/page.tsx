@@ -16,10 +16,10 @@ export default function MyCarsPage() {
       <SiteHeader />
 
       <main className="mx-auto max-w-4xl px-6 pt-4 pb-24">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-neutral-100">
           Your cars
         </h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-sm text-slate-500 dark:text-neutral-400">
           Every booking you&apos;ve made through TryDrive.
         </p>
 

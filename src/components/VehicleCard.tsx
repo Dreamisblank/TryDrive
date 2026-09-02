@@ -20,7 +20,7 @@ export default function VehicleCard({
   }).toString()}`;
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm sm:flex-row">
+    <div className="flex flex-col items-center gap-4 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-4 shadow-sm backdrop-blur-sm sm:flex-row">
       <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-orange-50 dark:bg-orange-950/30">
         {vehicle.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -38,21 +38,21 @@ export default function VehicleCard({
         <span className="inline-block rounded-full bg-orange-100 dark:bg-orange-900/40 px-2.5 py-0.5 text-xs font-medium text-orange-700 dark:text-orange-400">
           {vehicle.category}
         </span>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{vehicle.name}</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-neutral-100">{vehicle.name}</h3>
+        <p className="text-sm text-slate-500 dark:text-neutral-400">
           {vehicle.transmission} · {vehicle.seats} seats · {vehicle.fuel}
           {vehicle.minDriverAge !== null && ` · Min. age ${vehicle.minDriverAge}+`}
         </p>
-        <p className="text-xs text-slate-400 dark:text-slate-500">{vehicle.company}</p>
+        <p className="text-xs text-slate-400 dark:text-neutral-500">{vehicle.company}</p>
       </div>
 
       <div className="flex flex-col items-center gap-2 sm:items-end">
         <div className="text-right">
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100">
             {c}
             {vehicle.totalPrice.toFixed(2)}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="text-xs text-slate-500 dark:text-neutral-400">
             {vehicle.cheapestInsurance
               ? "Total price incl. insurance"
               : "Total price (no insurance offered)"}

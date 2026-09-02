@@ -18,7 +18,7 @@ export default function Home() {
         <div className="mt-10 w-full">
           <CarSearchForm />
         </div>
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-xs text-slate-500 dark:text-neutral-400">
           Demo mode — results limited to Larnaca, Cyprus
         </p>
       </main>

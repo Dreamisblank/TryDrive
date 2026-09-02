@@ -14,7 +14,7 @@ type DriverInfo = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-orange-400";
+  "w-full rounded-xl border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-slate-900 dark:text-neutral-100 outline-none focus:border-orange-400";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -202,7 +202,7 @@ export default function BookingForm({
   return (
     <div className="mt-6">
       {/* Summary card */}
-      <div className="flex flex-col gap-4 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-5 shadow-sm sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-5 shadow-sm sm:flex-row sm:items-center">
         <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-orange-50 dark:bg-orange-950/30">
           {vehicle.image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -219,60 +219,60 @@ export default function BookingForm({
           <span className="inline-block rounded-full bg-orange-100 dark:bg-orange-900/40 px-2.5 py-0.5 text-xs font-medium text-orange-700 dark:text-orange-400">
             {vehicle.category}
           </span>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-neutral-100">
             {vehicle.name}
           </h1>
-          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-neutral-400">
             {vehicle.transmission} · {vehicle.seats} seats · {vehicle.fuel} ·{" "}
             {vehicle.company}
           </p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="text-3xl font-bold text-slate-900 dark:text-neutral-100">
             {c}
             {total.toFixed(2)}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="text-xs text-slate-500 dark:text-neutral-400">
             Total for {days} day{days === 1 ? "" : "s"}
           </div>
         </div>
       </div>
 
       {/* Trip details */}
-      <div className="mt-6 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-5 shadow-sm">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+      <div className="mt-6 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-5 shadow-sm">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-neutral-400 uppercase">
           Trip details
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <div>
-            <div className="text-xs font-medium text-slate-400 dark:text-slate-500">Pickup</div>
-            <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+            <div className="text-xs font-medium text-slate-400 dark:text-neutral-500">Pickup</div>
+            <div className="text-sm font-medium text-slate-900 dark:text-neutral-100">
               {formatDate(pickupDate)}
             </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Larnaca, Cyprus (Demo)</div>
+            <div className="text-sm text-slate-600 dark:text-neutral-300">Larnaca, Cyprus (Demo)</div>
           </div>
           <div>
-            <div className="text-xs font-medium text-slate-400 dark:text-slate-500">Return</div>
-            <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
+            <div className="text-xs font-medium text-slate-400 dark:text-neutral-500">Return</div>
+            <div className="text-sm font-medium text-slate-900 dark:text-neutral-100">
               {formatDate(dropoffDate)}
             </div>
-            <div className="text-sm text-slate-600 dark:text-slate-300">Larnaca, Cyprus (Demo)</div>
+            <div className="text-sm text-slate-600 dark:text-neutral-300">Larnaca, Cyprus (Demo)</div>
           </div>
         </div>
         {vehicle.minDriverAge !== null && (
-          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-3 text-xs text-slate-500 dark:text-neutral-400">
             Minimum driver age: {vehicle.minDriverAge}+ (searched: {driverAge})
           </p>
         )}
       </div>
 
       {/* Price breakdown */}
-      <div className="mt-6 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-5 shadow-sm">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+      <div className="mt-6 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-5 shadow-sm">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-neutral-400 uppercase">
           Price breakdown
         </h2>
 
-        <div className="mt-3 flex justify-between text-sm text-slate-700 dark:text-slate-200">
+        <div className="mt-3 flex justify-between text-sm text-slate-700 dark:text-neutral-200">
           <span>Base rental ({days} day{days === 1 ? "" : "s"})</span>
           <span className="font-medium">
             {c}
@@ -292,7 +292,7 @@ export default function BookingForm({
 
         {vehicle.insuranceOptions.length > 0 && (
           <fieldset className="mt-4">
-            <legend className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <legend className="text-xs font-medium text-slate-500 dark:text-neutral-400">
               Insurance
             </legend>
             <div className="mt-2 space-y-2">
@@ -302,7 +302,7 @@ export default function BookingForm({
                   className={`flex cursor-pointer items-start justify-between gap-3 rounded-xl border px-3 py-2 text-sm transition ${
                     selectedInsuranceIndex === idx
                       ? "border-orange-400 dark:border-orange-500 bg-orange-50 dark:bg-orange-950/30"
-                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-orange-200 dark:hover:border-orange-800"
+                      : "border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-orange-200 dark:hover:border-orange-800"
                   }`}
                 >
                   <span className="flex items-start gap-2">
@@ -314,15 +314,15 @@ export default function BookingForm({
                       className="mt-1"
                     />
                     <span>
-                      <span className="block font-medium text-slate-900 dark:text-slate-100">
+                      <span className="block font-medium text-slate-900 dark:text-neutral-100">
                         {ins.name}
                       </span>
-                      <span className="block text-xs text-slate-500 dark:text-slate-400">
+                      <span className="block text-xs text-slate-500 dark:text-neutral-400">
                         {ins.description}
                       </span>
                     </span>
                   </span>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                  <span className="font-medium text-slate-900 dark:text-neutral-100">
                     {ins.price === 0 ? "Free" : `${c}${ins.price.toFixed(2)}`}
                   </span>
                 </label>
@@ -331,14 +331,14 @@ export default function BookingForm({
           </fieldset>
         )}
 
-        <div className="mt-4 flex justify-between border-t border-slate-200 dark:border-slate-700 pt-3 text-base font-semibold text-slate-900 dark:text-slate-100">
+        <div className="mt-4 flex justify-between border-t border-slate-200 dark:border-neutral-700 pt-3 text-base font-semibold text-slate-900 dark:text-neutral-100">
           <span>Total</span>
           <span>
             {c}
             {total.toFixed(2)}
           </span>
         </div>
-        <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
+        <p className="mt-2 text-xs text-slate-400 dark:text-neutral-500">
           Estimated total. The rental company may confirm a different final
           amount, including taxes or fees, once your booking is created.
         </p>
@@ -347,9 +347,9 @@ export default function BookingForm({
       {/* Driver details + submit */}
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-3xl border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-5 shadow-sm"
+        className="mt-6 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-5 shadow-sm"
       >
-        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-neutral-400 uppercase">
           Driver details
         </h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -379,7 +379,7 @@ export default function BookingForm({
             placeholder="Phone"
             className={inputClass}
           />
-          <label className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400">
+          <label className="flex flex-col gap-1 text-xs text-slate-500 dark:text-neutral-400">
             Date of birth
             <input
               name="birthdate"
@@ -388,7 +388,7 @@ export default function BookingForm({
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400 sm:col-span-2">
+          <label className="flex flex-col gap-1 text-xs text-slate-500 dark:text-neutral-400 sm:col-span-2">
             Notes for the rental company (optional)
             <input
               name="comment"

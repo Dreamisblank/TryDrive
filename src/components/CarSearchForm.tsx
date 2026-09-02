@@ -136,11 +136,11 @@ export default function CarSearchForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/80 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
+      className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
         <label className="flex flex-1 cursor-pointer flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:min-w-[220px]">
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
             <PinIcon />
             Pickup location
           </span>
@@ -148,18 +148,18 @@ export default function CarSearchForm() {
             id="pickupLocation"
             name="pickupLocation"
             defaultValue={DEMO_LOCATION_LABEL}
-            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 dark:text-slate-100 outline-none"
+            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 dark:text-neutral-100 outline-none"
           >
             <option value={DEMO_LOCATION_LABEL}>{DEMO_LOCATION_LABEL}</option>
           </select>
         </label>
 
         <div className="flex flex-1 flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 sm:min-w-[260px]">
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
             <CalendarIcon />
             Dates
           </span>
-          <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-slate-100">
+          <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-neutral-100">
             <div className="relative">
               <input
                 id="pickupDate"
@@ -172,7 +172,7 @@ export default function CarSearchForm() {
                 className="date-pill-input w-[104px] bg-transparent outline-none [color-scheme:light]"
               />
             </div>
-            <span className="text-slate-400 dark:text-slate-500">&rarr;</span>
+            <span className="text-slate-400 dark:text-neutral-500">&rarr;</span>
             <div className="relative">
               <input
                 id="dropoffDate"
@@ -189,7 +189,7 @@ export default function CarSearchForm() {
         </div>
 
         <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:max-w-[160px]">
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
             <UserIcon />
             Driver age
           </span>
@@ -202,7 +202,7 @@ export default function CarSearchForm() {
             max={99}
             value={driverAge}
             onChange={(event) => setDriverAge(event.target.value)}
-            className="bg-transparent text-base font-medium text-slate-900 dark:text-slate-100 outline-none"
+            className="bg-transparent text-base font-medium text-slate-900 dark:text-neutral-100 outline-none"
           />
         </label>
 

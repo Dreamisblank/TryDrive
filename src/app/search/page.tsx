@@ -48,29 +48,29 @@ export default async function SearchResultsPage({
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-6 pt-4 pb-24">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-3xl">
           Search results
         </h1>
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-neutral-300 sm:grid-cols-4">
           <div>
-            <dt className="font-medium text-slate-900 dark:text-slate-100">Location</dt>
+            <dt className="font-medium text-slate-900 dark:text-neutral-100">Location</dt>
             <dd>{location || "—"}</dd>
           </div>
           <div>
-            <dt className="font-medium text-slate-900 dark:text-slate-100">Pickup</dt>
+            <dt className="font-medium text-slate-900 dark:text-neutral-100">Pickup</dt>
             <dd>{pickupDate || "—"}</dd>
           </div>
           <div>
-            <dt className="font-medium text-slate-900 dark:text-slate-100">Dropoff</dt>
+            <dt className="font-medium text-slate-900 dark:text-neutral-100">Dropoff</dt>
             <dd>{dropoffDate || "—"}</dd>
           </div>
           <div>
-            <dt className="font-medium text-slate-900 dark:text-slate-100">Driver age</dt>
+            <dt className="font-medium text-slate-900 dark:text-neutral-100">Driver age</dt>
             <dd>{driverAge || "—"}</dd>
           </div>
         </dl>
 
-        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-4 text-sm text-slate-500 dark:text-neutral-400">
           Demo mode — results limited to Larnaca, Cyprus regardless of the
           pickup location entered. Insurance prices are flat (not age-based);
           where a young-driver fee applies to your age, it&apos;s added to the
@@ -78,13 +78,13 @@ export default async function SearchResultsPage({
         </p>
 
         {!hasValidParams && (
-          <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-slate-500 dark:text-slate-400 backdrop-blur-sm">
+          <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
             Run a search from the homepage to see live results.
           </div>
         )}
 
         {hasValidParams && error && (
-          <div className="mt-10 rounded-3xl border border-dashed border-red-300 dark:border-red-900/50 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-red-600 dark:text-red-400 backdrop-blur-sm">
+          <div className="mt-10 rounded-3xl border border-dashed border-red-300 dark:border-red-900/50 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-red-600 dark:text-red-400 backdrop-blur-sm">
             {error}
           </div>
         )}
@@ -92,7 +92,7 @@ export default async function SearchResultsPage({
         {results && (
           <>
             {results.excludedForMinAge > 0 && (
-              <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">
+              <p className="mt-6 text-sm text-slate-500 dark:text-neutral-400">
                 {results.excludedForMinAge} vehicle
                 {results.excludedForMinAge === 1 ? "" : "s"} hidden — driver
                 age {parsedAge} is below the minimum age required.
@@ -100,7 +100,7 @@ export default async function SearchResultsPage({
             )}
 
             {results.vehicles.length === 0 ? (
-              <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-slate-500 dark:text-slate-400 backdrop-blur-sm">
+              <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
                 No vehicles available for these dates in the demo inventory.
               </div>
             ) : (

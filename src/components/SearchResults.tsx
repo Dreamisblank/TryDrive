@@ -33,7 +33,7 @@ export default function SearchResults({
           className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
             activeCategory === "all"
               ? "bg-orange-600 text-white"
-              : "bg-white/80 text-slate-700 dark:text-slate-200 hover:bg-orange-100"
+              : "bg-white/80 text-slate-700 dark:text-neutral-200 hover:bg-orange-100"
           }`}
         >
           All categories
@@ -46,7 +46,7 @@ export default function SearchResults({
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
               activeCategory === category
                 ? "bg-orange-600 text-white"
-                : "bg-white/80 text-slate-700 dark:text-slate-200 hover:bg-orange-100"
+                : "bg-white/80 text-slate-700 dark:text-neutral-200 hover:bg-orange-100"
             }`}
           >
             {category}
@@ -55,7 +55,7 @@ export default function SearchResults({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="mt-6 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-slate-900/60 p-10 text-center text-slate-500 dark:text-slate-400 backdrop-blur-sm">
+        <div className="mt-6 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
           No vehicles in this category for your search.
         </div>
       ) : (

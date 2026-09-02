@@ -16,7 +16,7 @@ function formatDate(iso: string | null) {
 }
 
 const panel =
-  "mt-8 rounded-3xl border border-dashed border-orange-300 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm dark:border-orange-800 dark:bg-slate-900/60 dark:text-slate-400";
+  "mt-8 rounded-3xl border border-dashed border-orange-300 bg-white/70 p-10 text-center text-slate-500 backdrop-blur-sm dark:border-orange-800 dark:bg-neutral-900/60 dark:text-neutral-400";
 
 export default function MyCars() {
   const { user, loading, configured, openSignIn } = useAuth();
@@ -82,37 +82,37 @@ export default function MyCars() {
         return (
           <div
             key={b.id}
-            className="flex flex-col gap-4 rounded-3xl border border-orange-900/5 bg-white/90 p-5 shadow-sm sm:flex-row sm:items-center dark:border-slate-700/60 dark:bg-slate-900/80"
+            className="flex flex-col gap-4 rounded-3xl border border-orange-900/5 bg-white/90 p-5 shadow-sm sm:flex-row sm:items-center dark:border-neutral-700/60 dark:bg-neutral-900/80"
           >
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-neutral-100">
                   {b.vehicle_name ?? "Vehicle"}
                 </h2>
                 <span className="rounded-full bg-orange-100 px-2.5 py-0.5 font-mono text-xs font-medium text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
                   {b.booking_ref}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              <p className="mt-1 text-sm text-slate-600 dark:text-neutral-300">
                 {formatDate(b.pickup_datetime)} → {formatDate(b.return_datetime)}
               </p>
               {b.pickup_location && (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-slate-500 dark:text-neutral-400">
                   {b.pickup_location}
                 </p>
               )}
               {b.insurance_name && (
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">
                   Insurance: {b.insurance_name}
                 </p>
               )}
             </div>
 
             <div className="text-right">
-              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100">
                 {b.total_price == null ? "—" : `${symbol}${Number(b.total_price).toFixed(2)}`}
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
+              <div className="text-xs text-slate-500 dark:text-neutral-400">
                 Booked {formatDate(b.created_at)}
               </div>
             </div>

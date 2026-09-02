@@ -10,8 +10,8 @@
 }
 
 .dark {
-  --background: #0b1120;
-  --foreground: #e2e8f0;
+  --background: #0a0a0a;
+  --foreground: #e5e5e5;
 }
 
 @theme inline {
@@ -59,7 +59,7 @@ body {
     radial-gradient(55% 45% at 50% 50%, rgba(251, 146, 60, 0.08) 0%, transparent 70%),
     radial-gradient(50% 42% at 10% 85%, rgba(249, 115, 22, 0.14) 0%, transparent 70%),
     radial-gradient(48% 40% at 92% 88%, rgba(234, 88, 12, 0.12) 0%, transparent 70%),
-    linear-gradient(to bottom, #0b1120 0%, #0f172a 55%, #0b1120 100%);
+    linear-gradient(to bottom, #0a0a0a 0%, #141414 55%, #0a0a0a 100%);
 }
 
 /* Sign-in modal header. Dots and gradient share one background-image, so a
@@ -74,7 +74,7 @@ body {
 .dark .auth-modal-banner {
   background-image:
     radial-gradient(circle, rgba(251, 146, 60, 0.35) 1.1px, transparent 1.3px),
-    linear-gradient(to bottom, #1e293b, #0f172a);
+    linear-gradient(to bottom, #262626, #171717);
   background-size: 9px 9px, 100% 100%;
 }
 

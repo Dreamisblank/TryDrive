@@ -39,10 +39,10 @@ const TABS: { id: SettingsTab; label: string }[] = [
 ];
 
 const card =
-  "rounded-2xl border border-slate-200 bg-white dark:border-slate-700/60 dark:bg-slate-900";
-const label = "text-xs font-medium text-slate-500 dark:text-slate-400";
+  "rounded-2xl border border-slate-200 bg-white dark:border-neutral-700/60 dark:bg-neutral-900";
+const label = "text-xs font-medium text-slate-500 dark:text-neutral-400";
 const input =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-orange-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-orange-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100";
 
 export default function SettingsModal({
   initialTab = "account",
@@ -84,14 +84,14 @@ export default function SettingsModal({
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        className="relative flex h-full w-full flex-col overflow-hidden bg-white dark:bg-slate-900 sm:h-[min(90vh,640px)] sm:max-w-4xl sm:flex-row sm:rounded-3xl sm:shadow-2xl"
+        className="relative flex h-full w-full flex-col overflow-hidden bg-white dark:bg-neutral-900 sm:h-[min(90vh,640px)] sm:max-w-4xl sm:flex-row sm:rounded-3xl sm:shadow-2xl"
       >
         {/* Nav: a horizontally-scrollable tab bar stacked above the panel on
             mobile; a vertical sidebar beside it from sm: up. */}
-        <nav className="flex shrink-0 flex-col border-b border-slate-200 bg-slate-50/60 p-3 dark:border-slate-700/60 dark:bg-slate-800/40 sm:w-48 sm:justify-between sm:border-r sm:border-b-0">
+        <nav className="flex shrink-0 flex-col border-b border-slate-200 bg-slate-50/60 p-3 dark:border-neutral-700/60 dark:bg-neutral-800/40 sm:w-48 sm:justify-between sm:border-r sm:border-b-0">
           <div>
             <div className="flex items-center justify-between px-1 pt-1 pb-3 sm:px-2 sm:pt-2">
-              <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-neutral-100">
                 Settings
               </h2>
               {/* Inline on mobile, where it sits in this header row rather
@@ -100,7 +100,7 @@ export default function SettingsModal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:hidden dark:hover:bg-slate-800 dark:hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:hidden dark:hover:bg-neutral-800 dark:hover:text-white"
               >
                 {closeIcon}
               </button>
@@ -140,7 +140,7 @@ export default function SettingsModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-3 right-4 hidden h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:flex dark:hover:bg-slate-800 dark:hover:text-white"
+            className="absolute top-3 right-4 hidden h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:flex dark:hover:bg-neutral-800 dark:hover:text-white"
           >
             {closeIcon}
           </button>
@@ -172,7 +172,7 @@ function SidebarButton({
       className={`shrink-0 rounded-xl px-3 py-2 text-left text-sm whitespace-nowrap transition sm:w-full ${
         active
           ? "bg-orange-100 font-semibold text-orange-800 dark:bg-orange-900/40 dark:text-orange-300"
-          : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+          : "text-slate-600 hover:bg-slate-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
       }`}
     >
       {children}
@@ -229,10 +229,10 @@ function AccountPanel({ onGoToDetails }: { onGoToDetails: () => void }) {
           </span>
         )}
         <div className="min-w-0">
-          <p className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+          <p className="truncate text-base font-semibold text-slate-900 dark:text-neutral-100">
             {displayNameFor(user, profile)}
           </p>
-          <p className="truncate text-sm text-slate-500 dark:text-slate-400">
+          <p className="truncate text-sm text-slate-500 dark:text-neutral-400">
             {user?.email ?? user?.phone}
           </p>
         </div>
@@ -241,7 +241,7 @@ function AccountPanel({ onGoToDetails }: { onGoToDetails: () => void }) {
       <div className="grid grid-cols-2 gap-3">
         <div className={`${card} p-4`}>
           <p className={label}>Total spent</p>
-          <p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+          <p className="mt-1 text-xl font-bold text-slate-900 dark:text-neutral-100">
             {totals.length === 0
               ? "—"
               : totals
@@ -251,7 +251,7 @@ function AccountPanel({ onGoToDetails }: { onGoToDetails: () => void }) {
         </div>
         <div className={`${card} p-4`}>
           <p className={label}>Bookings</p>
-          <p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+          <p className="mt-1 text-xl font-bold text-slate-900 dark:text-neutral-100">
             {bookings === null ? "—" : bookings.length}
           </p>
         </div>
@@ -269,10 +269,10 @@ function AccountPanel({ onGoToDetails }: { onGoToDetails: () => void }) {
           </svg>
         </span>
         <span className="flex-1">
-          <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <span className="block text-sm font-semibold text-slate-900 dark:text-neutral-100">
             Add driver details
           </span>
-          <span className="block text-xs text-slate-500 dark:text-slate-400">
+          <span className="block text-xs text-slate-500 dark:text-neutral-400">
             {completion}% complete
           </span>
         </span>
@@ -358,10 +358,10 @@ function DetailsPanel() {
     <form onSubmit={handleSave} className="space-y-6">
       {DETAIL_GROUPS.map((group) => (
         <div key={group.heading}>
-          <p className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <p className="mb-2 text-sm font-semibold text-slate-900 dark:text-neutral-100">
             {group.heading}
           </p>
-          <div className={`${card} divide-y divide-slate-100 dark:divide-slate-800`}>
+          <div className={`${card} divide-y divide-slate-100 dark:divide-neutral-800`}>
             {group.fields.map((f) => (
               <div
                 key={String(f.key)}
@@ -394,7 +394,7 @@ function DetailsPanel() {
           {saving ? "Saving…" : "Save changes"}
         </button>
         {status && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{status}</p>
+          <p className="text-sm text-slate-500 dark:text-neutral-400">{status}</p>
         )}
       </div>
     </form>
@@ -436,19 +436,19 @@ function NotificationsPanel() {
 
   return (
     <div>
-      <p className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+      <p className="mb-2 text-sm font-semibold text-slate-900 dark:text-neutral-100">
         Email
       </p>
-      <div className={`${card} divide-y divide-slate-100 dark:divide-slate-800`}>
+      <div className={`${card} divide-y divide-slate-100 dark:divide-neutral-800`}>
         {NOTIFICATIONS.map((n) => {
           const on = Boolean(profile?.[n.key]);
           return (
             <div key={String(n.key)} className="flex items-center gap-4 p-4">
               <div className="flex-1">
-                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                <p className="text-sm font-medium text-slate-900 dark:text-neutral-100">
                   {n.title}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-neutral-400">
                   {n.description}
                 </p>
               </div>
@@ -460,7 +460,7 @@ function NotificationsPanel() {
                 disabled={pending === n.key}
                 onClick={() => toggle(n.key, !on)}
                 className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
-                  on ? "bg-orange-600" : "bg-slate-300 dark:bg-slate-700"
+                  on ? "bg-orange-600" : "bg-slate-300 dark:bg-neutral-700"
                 }`}
               >
                 <span
@@ -529,15 +529,15 @@ function SettingsPanel() {
 
   return (
     <div className="space-y-5">
-      <div className={`${card} divide-y divide-slate-100 dark:divide-slate-800`}>
+      <div className={`${card} divide-y divide-slate-100 dark:divide-neutral-800`}>
         <div className="flex items-center gap-4 p-4">
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Theme</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-sm font-medium text-slate-900 dark:text-neutral-100">Theme</p>
+            <p className="text-xs text-slate-500 dark:text-neutral-400">
               How TryDrive looks on this device.
             </p>
           </div>
-          <div className="flex rounded-full bg-slate-100 p-0.5 dark:bg-slate-800">
+          <div className="flex rounded-full bg-slate-100 p-0.5 dark:bg-neutral-800">
             {THEME_OPTIONS.map((opt) => (
               <button
                 key={opt.id}
@@ -545,8 +545,8 @@ function SettingsPanel() {
                 onClick={() => setTheme(opt.id)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                   theme === opt.id
-                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    ? "bg-white text-slate-900 shadow-sm dark:bg-neutral-700 dark:text-white"
+                    : "text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-neutral-200"
                 }`}
               >
                 {opt.label}
@@ -557,8 +557,8 @@ function SettingsPanel() {
 
         <div className="flex items-center gap-4 p-4">
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Currency</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-sm font-medium text-slate-900 dark:text-neutral-100">Currency</p>
+            <p className="text-xs text-slate-500 dark:text-neutral-400">
               Used to price every car you search.
             </p>
           </div>
@@ -566,7 +566,7 @@ function SettingsPanel() {
             value={currency}
             onChange={(e) => chooseCurrency(e.target.value)}
             aria-label="Currency"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           >
             {CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>
@@ -578,12 +578,12 @@ function SettingsPanel() {
 
         <div className="flex items-center gap-4 p-4">
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Account ID</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-sm font-medium text-slate-900 dark:text-neutral-100">Account ID</p>
+            <p className="text-xs text-slate-500 dark:text-neutral-400">
               Share with support to identify your account.
             </p>
           </div>
-          <code className="font-mono text-xs text-slate-400 dark:text-slate-500">
+          <code className="font-mono text-xs text-slate-400 dark:text-neutral-500">
             {user?.id.slice(0, 8).toUpperCase()}
           </code>
         </div>
@@ -595,7 +595,7 @@ function SettingsPanel() {
             <p className="text-sm font-medium text-red-600 dark:text-red-400">
               Delete account
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-neutral-400">
               Removes your profile and booking history. Cannot be undone.
             </p>
           </div>
@@ -618,7 +618,7 @@ function SettingsPanel() {
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
               >
                 Cancel
               </button>
@@ -646,10 +646,10 @@ function HelpPanel() {
   return (
     <div className="space-y-4">
       <div className={`${card} p-6`}>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-neutral-100">
           Get help
         </h3>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-2 text-sm text-slate-600 dark:text-neutral-300">
           Questions about a booking, a refund or your account? Email us and
           we&apos;ll get back to you.
         </p>
@@ -662,10 +662,10 @@ function HelpPanel() {
       </div>
 
       <div className={`${card} p-6`}>
-        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+        <p className="text-sm font-medium text-slate-900 dark:text-neutral-100">
           Already booked?
         </p>
-        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-neutral-300">
           Changes and cancellations are handled by the rental company that owns
           the car, not by TryDrive. Your booking reference is on the Cars page.
         </p>

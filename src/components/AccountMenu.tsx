@@ -99,7 +99,7 @@ function Avatar({
 }
 
 const rowClass =
-  "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition hover:bg-orange-50 dark:text-slate-200 dark:hover:bg-orange-950/40";
+  "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition hover:bg-orange-50 dark:text-neutral-200 dark:hover:bg-orange-950/40";
 
 export default function AccountMenu() {
   const { user, profile, configured, openSignIn, signOut } = useAuth();
@@ -158,7 +158,7 @@ export default function AccountMenu() {
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label="Account menu"
-          className="block h-9 w-9 overflow-hidden rounded-full ring-1 ring-slate-200 transition hover:ring-orange-400 dark:ring-slate-700"
+          className="block h-9 w-9 overflow-hidden rounded-full ring-1 ring-slate-200 transition hover:ring-orange-400 dark:ring-neutral-700"
         >
           <Avatar url={avatarUrl} initial={initial} className="h-9 w-9 rounded-full" />
         </button>
@@ -166,7 +166,7 @@ export default function AccountMenu() {
         {open && (
           <div
             role="menu"
-            className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-orange-900/5 bg-white py-1.5 shadow-xl dark:border-slate-700/60 dark:bg-slate-900"
+            className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-orange-900/5 bg-white py-1.5 shadow-xl dark:border-neutral-700/60 dark:bg-neutral-900"
           >
             <button
               type="button"
@@ -179,10 +179,10 @@ export default function AccountMenu() {
                 className="h-10 w-10 shrink-0 rounded-full"
               />
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <span className="block truncate text-sm font-semibold text-slate-900 dark:text-neutral-100">
                   {name}
                 </span>
-                <span className="block truncate text-xs text-slate-500 dark:text-slate-400">
+                <span className="block truncate text-xs text-slate-500 dark:text-neutral-400">
                   {user.email ?? user.phone}
                 </span>
               </span>
@@ -191,7 +191,7 @@ export default function AccountMenu() {
               </svg>
             </button>
 
-            <div className="my-1.5 h-px bg-slate-100 dark:bg-slate-800" />
+            <div className="my-1.5 h-px bg-slate-100 dark:bg-neutral-800" />
 
             <Link href="/account/cars" onClick={() => setOpen(false)} className={rowClass} role="menuitem">
               <CarIcon />
@@ -202,7 +202,7 @@ export default function AccountMenu() {
               Settings
             </button>
 
-            <div className="my-1.5 h-px bg-slate-100 dark:bg-slate-800" />
+            <div className="my-1.5 h-px bg-slate-100 dark:bg-neutral-800" />
 
             <button type="button" onClick={() => openSettings("help")} className={rowClass} role="menuitem">
               <HelpIcon />
@@ -272,21 +272,21 @@ function LogoutConfirm({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="logout-title"
-        className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900"
+        className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-neutral-900"
       >
         <div className="px-6 pt-6 pb-5">
-          <h2 id="logout-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h2 id="logout-title" className="text-lg font-semibold text-slate-900 dark:text-neutral-100">
             Log out?
           </h2>
-          <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-500 dark:text-neutral-400">
             You&apos;ll need to sign back in to book a car and see your trips.
           </p>
         </div>
-        <div className="flex justify-end gap-2 bg-slate-50 px-6 py-4 dark:bg-slate-800/60">
+        <div className="flex justify-end gap-2 bg-slate-50 px-6 py-4 dark:bg-neutral-800/60">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
           >
             Cancel
           </button>

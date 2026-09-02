@@ -24,7 +24,7 @@ export default function HeroHeadline() {
   }, []);
 
   return (
-    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl">
+    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-5xl">
       {headline}
     </h1>
   );
