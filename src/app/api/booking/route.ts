@@ -31,6 +31,12 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+// Off by default: flipping this on makes createBooking() below place a real
+// order with a real rental company through RentSyst's live API. Everything
+// else in this route (auth, validation) runs for real regardless, so the
+// rest of the flow can be exercised properly while this stays off.
+const BOOKINGS_ENABLED = process.env.BOOKINGS_ENABLED === "true";
+
 export async function POST(request: Request) {
   let body: Partial<BookingRequestBody>;
   try {
@@ -71,6 +77,16 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: `Missing required field(s): ${missing.join(", ")}` },
       { status: 400 },
+    );
+  }
+
+  if (!BOOKINGS_ENABLED) {
+    return NextResponse.json(
+      {
+        error:
+          "Bookings aren't available yet — this is a preview build. Check back soon.",
+      },
+      { status: 403 },
     );
   }
 

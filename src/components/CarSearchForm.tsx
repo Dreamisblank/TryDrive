@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { RentSystLocation } from "@/lib/rentsyst";
+import LocationAutocomplete from "./LocationAutocomplete";
 
 // Local calendar date (not toISOString, which shifts to UTC and can land
 // on the wrong day depending on the browser's timezone offset).
@@ -24,23 +25,6 @@ function addDays(iso: string, days: number) {
 // there. A 2-day buffer comfortably clears that skew.
 function earliestPickupIso() {
   return addDays(toIso(new Date()), 2);
-}
-
-function PinIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4"
-    >
-      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  );
 }
 
 function CalendarIcon() {
@@ -107,16 +91,6 @@ export default function CarSearchForm({
     locations[0] ? String(locations[0].id) : "",
   );
 
-  const locationsByCompany = useMemo(() => {
-    const groups = new Map<string, RentSystLocation[]>();
-    for (const loc of locations) {
-      const group = groups.get(loc.companyName) ?? [];
-      group.push(loc);
-      groups.set(loc.companyName, group);
-    }
-    return Array.from(groups.entries());
-  }, [locations]);
-
   function handlePickupDateChange(nextPickupDate: string) {
     setPickupDate(nextPickupDate);
     // Keep dropoff strictly after pickup instead of leaving a stale/invalid gap.
@@ -165,34 +139,11 @@ export default function CarSearchForm({
       className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
-        <label className="flex flex-1 cursor-pointer flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:min-w-[220px]">
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
-            <PinIcon />
-            Pickup location
-          </span>
-          <select
-            id="pickupLocation"
-            name="pickupLocation"
-            value={locationId}
-            onChange={(event) => setLocationId(event.target.value)}
-            disabled={locations.length === 0}
-            required
-            className="cursor-pointer appearance-none bg-transparent text-base font-medium text-slate-900 dark:text-neutral-100 outline-none disabled:cursor-not-allowed"
-          >
-            {locations.length === 0 && (
-              <option value="">No locations available</option>
-            )}
-            {locationsByCompany.map(([companyName, companyLocations]) => (
-              <optgroup key={companyName} label={companyName}>
-                {companyLocations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
+        <LocationAutocomplete
+          locations={locations}
+          value={locationId}
+          onChange={setLocationId}
+        />
 
         <div className="flex flex-1 flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 sm:min-w-[260px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
