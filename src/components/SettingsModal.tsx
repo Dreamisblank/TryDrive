@@ -68,41 +68,64 @@ export default function SettingsModal({
     };
   }, [onClose]);
 
+  const closeIcon = (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
+      <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+    // Full-screen sheet on mobile (no surrounding padding to peek behind it);
+    // a centred card from sm: up, same as before.
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm sm:block" onClick={onClose} />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        className="relative flex h-[min(90vh,640px)] w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-900"
+        className="relative flex h-full w-full flex-col overflow-hidden bg-white dark:bg-slate-900 sm:h-[min(90vh,640px)] sm:max-w-4xl sm:flex-row sm:rounded-3xl sm:shadow-2xl"
       >
-        {/* Sidebar */}
-        <nav className="flex w-48 shrink-0 flex-col justify-between border-r border-slate-200 bg-slate-50/60 p-3 dark:border-slate-700/60 dark:bg-slate-800/40">
-          <div className="space-y-0.5">
-            <h2 className="px-3 pt-2 pb-3 text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
-              Settings
-            </h2>
-            {TABS.map((t) => (
-              <SidebarButton
-                key={t.id}
-                active={tab === t.id}
-                onClick={() => setTab(t.id)}
+        {/* Nav: a horizontally-scrollable tab bar stacked above the panel on
+            mobile; a vertical sidebar beside it from sm: up. */}
+        <nav className="flex shrink-0 flex-col border-b border-slate-200 bg-slate-50/60 p-3 dark:border-slate-700/60 dark:bg-slate-800/40 sm:w-48 sm:justify-between sm:border-r sm:border-b-0">
+          <div>
+            <div className="flex items-center justify-between px-1 pt-1 pb-3 sm:px-2 sm:pt-2">
+              <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                Settings
+              </h2>
+              {/* Inline on mobile, where it sits in this header row rather
+                  than floating over the panel below. */}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:hidden dark:hover:bg-slate-800 dark:hover:text-white"
               >
-                {t.label}
-              </SidebarButton>
-            ))}
+                {closeIcon}
+              </button>
+            </div>
+            <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 sm:mx-0 sm:block sm:space-y-0.5 sm:overflow-visible sm:px-0 sm:pb-0">
+              {TABS.map((t) => (
+                <SidebarButton
+                  key={t.id}
+                  active={tab === t.id}
+                  onClick={() => setTab(t.id)}
+                >
+                  {t.label}
+                </SidebarButton>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-0.5">
+          <div className="-mx-1 mt-2 flex gap-1 overflow-x-auto px-1 sm:mx-0 sm:mt-0 sm:block sm:space-y-0.5 sm:overflow-visible sm:px-0">
             <SidebarButton active={tab === "help"} onClick={() => setTab("help")}>
               Get help
             </SidebarButton>
             <button
               type="button"
               onClick={onRequestLogout}
-              className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+              className="shrink-0 rounded-xl px-3 py-2 text-left text-sm font-medium whitespace-nowrap text-red-600 transition hover:bg-red-50 sm:w-full dark:text-red-400 dark:hover:bg-red-950/30"
             >
               Log out
             </button>
@@ -110,27 +133,24 @@ export default function SettingsModal({
         </nav>
 
         {/* Panel */}
-        {/* Extra top padding (vs. the p-6 used on the other sides) clears
-            the close button below, which sits at top-3 - without it, the
-            first row of content overlapped the button's hitbox. */}
-        <div className="flex-1 overflow-y-auto px-6 pt-14 pb-6">
+        <div className="relative flex-1 overflow-y-auto p-6 sm:pt-14">
+          {/* Desktop-only: sits over the panel's own top-right corner, so it
+              needs no clearance math beyond this container's padding. */}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute top-3 right-4 hidden h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 sm:flex dark:hover:bg-slate-800 dark:hover:text-white"
+          >
+            {closeIcon}
+          </button>
+
           {tab === "account" && <AccountPanel onGoToDetails={() => setTab("details")} />}
           {tab === "details" && <DetailsPanel />}
           {tab === "notifications" && <NotificationsPanel />}
           {tab === "settings" && <SettingsPanel />}
           {tab === "help" && <HelpPanel />}
         </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute top-3 right-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
-        >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
-            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
       </div>
     </div>
   );
@@ -149,7 +169,7 @@ function SidebarButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-xl px-3 py-2 text-left text-sm transition ${
+      className={`shrink-0 rounded-xl px-3 py-2 text-left text-sm whitespace-nowrap transition sm:w-full ${
         active
           ? "bg-orange-100 font-semibold text-orange-800 dark:bg-orange-900/40 dark:text-orange-300"
           : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
@@ -343,8 +363,11 @@ function DetailsPanel() {
           </p>
           <div className={`${card} divide-y divide-slate-100 dark:divide-slate-800`}>
             {group.fields.map((f) => (
-              <div key={String(f.key)} className="flex items-center gap-4 p-3.5">
-                <label className={`${label} w-40 shrink-0`} htmlFor={String(f.key)}>
+              <div
+                key={String(f.key)}
+                className="flex flex-col gap-1.5 p-3.5 sm:flex-row sm:items-center sm:gap-4"
+              >
+                <label className={`${label} sm:w-40 sm:shrink-0`} htmlFor={String(f.key)}>
                   {f.label}
                 </label>
                 <input

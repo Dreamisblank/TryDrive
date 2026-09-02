@@ -133,7 +133,7 @@ export default function AccountMenu() {
       <button
         type="button"
         onClick={() => openSignIn()}
-        className="rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-orange-700"
+        className="shrink-0 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-orange-700"
       >
         Sign in
       </button>

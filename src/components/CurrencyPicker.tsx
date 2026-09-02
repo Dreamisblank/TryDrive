@@ -86,7 +86,7 @@ export default function CurrencyPicker() {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Currency: ${active.label}`}
-        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-white/70 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white"
+        className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1.5 text-sm font-medium whitespace-nowrap text-slate-700 sm:gap-1.5 sm:px-3 dark:text-slate-200 transition hover:bg-white/70 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white"
       >
         <span>{active.symbol}</span>
         <span>{active.code}</span>

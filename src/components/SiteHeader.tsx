@@ -7,15 +7,15 @@ import AccountMenu from "./AccountMenu";
 // this header (home, privacy, terms, partner) statically prerenderable.
 export default function SiteHeader() {
   return (
-    <header className="flex items-center justify-between gap-4 px-6 py-6">
+    <header className="flex items-center justify-between gap-2 px-4 py-4 sm:gap-4 sm:px-6 sm:py-6">
       <Link
         href="/"
-        className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100"
+        className="shrink-0 text-2xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-100"
       >
         TryDrive
       </Link>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
         <CurrencyPicker />
         <AccountMenu />
       </div>
