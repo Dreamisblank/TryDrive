@@ -41,6 +41,13 @@ const themeBootScript = `
 })();
 `;
 
+/** Impact.com site-ownership verification + affiliate link tracking. */
+const impactTrackingScript = `
+(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7729294-eaac-4714-ac42-1e882d35f4531.js','script','impactStat',document,window);
+impactStat('transformLinks');
+impactStat('trackImpression');
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -48,6 +55,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      {/* A literal <head> (merged with the Metadata-API-generated one) rather
+          than next/script: Impact.com's site-verification crawler checks for
+          this script literally inside <head> in the raw HTML, and
+          next/script's beforeInteractive strategy actually emits into
+          <body>, not <head>. */}
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: impactTrackingScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         {/* next/script rather than a raw <script>: an inline script inside the
             React tree isn't executed on the client and breaks hydration.
