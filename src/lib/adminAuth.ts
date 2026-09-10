@@ -21,3 +21,17 @@ export async function computeSessionToken(password: string): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+
+/**
+ * Constant-time string comparison. A plain `===` short-circuits on the first
+ * mismatched character, which leaks the correct session token one byte at a
+ * time via response timing - this always walks the full length regardless.
+ */
+export function timingSafeEqual(a: string, b: string): boolean {
+  const len = Math.max(a.length, b.length, 1);
+  let diff = a.length === b.length ? 0 : 1;
+  for (let i = 0; i < len; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}

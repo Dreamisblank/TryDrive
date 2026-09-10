@@ -23,7 +23,14 @@ export async function getSupabaseServerClient(): Promise<SupabaseClient | null> 
           }
         } catch {
           // Called from a Server Component, where cookies are read-only.
-          // Session refresh is handled in proxy.ts instead, so this is safe.
+          // If getUser() below refreshes an expiring token, the refreshed
+          // cookie can't be persisted from here - the browser's own
+          // supabase-js client refreshes proactively in the background
+          // while a tab is open, so this only matters for a session that's
+          // gone stale while the site was closed. Worst case there: one
+          // extra sign-in prompt, not a security issue, since getUser()
+          // always revalidates against Supabase rather than trusting the
+          // cookie either way.
         }
       },
     },

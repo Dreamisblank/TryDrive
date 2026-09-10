@@ -12,12 +12,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@next/swc-wasm-nodejs": "16.3.0",
+    "@next/swc-wasm-nodejs": "16.3.4",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
-    "next": "16.3.0",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "next": "16.3.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "server-only": "^0.0.1",
     "three": "^0.185.1",
     "topojson-client": "^3.1.0",
@@ -31,7 +31,7 @@
     "@types/three": "^0.185.4",
     "@types/topojson-client": "^3.1.5",
     "eslint": "^9",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
