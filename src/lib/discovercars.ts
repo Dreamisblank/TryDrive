@@ -107,6 +107,8 @@ export type OfferSearchParams = {
 // that can be added here if a future screen needs them.
 type DiscoverCarsOffer = {
   offer_id: string;
+  pickup: { pickup_at: string; location: string };
+  dropoff: { dropoff_at: string; location: string };
   car: {
     name: string;
     sipp: string;
@@ -151,11 +153,21 @@ export type NormalizedOffer = {
   fuel: string;
   imageUrl: string | null;
   supplierName: string;
+  supplierLogo: string | null;
   supplierRating: number | null;
+  supplierReviewCount: number | null;
+  pickupAt: string;
+  pickupLocationName: string;
+  dropoffAt: string;
+  dropoffLocationName: string;
   totalPrice: number;
   currency: string;
   freeCancellation: boolean;
   unlimitedMileage: boolean;
+  includedMileageLimit: number | null;
+  mileageUnit: string;
+  depositAmount: number | null;
+  depositCurrency: string | null;
   bookingUrl: string;
 };
 
@@ -169,11 +181,21 @@ function normalizeOffer(offer: DiscoverCarsOffer): NormalizedOffer {
     fuel: offer.car.fuel,
     imageUrl: offer.car.image,
     supplierName: offer.supplier.name,
+    supplierLogo: offer.supplier.logo,
     supplierRating: offer.supplier.rating,
+    supplierReviewCount: offer.supplier.review_count,
+    pickupAt: offer.pickup.pickup_at,
+    pickupLocationName: offer.pickup.location,
+    dropoffAt: offer.dropoff.dropoff_at,
+    dropoffLocationName: offer.dropoff.location,
     totalPrice: offer.price.total,
     currency: offer.price.currency,
     freeCancellation: offer.cancellation.type === "free",
     unlimitedMileage: offer.mileage.unlimited,
+    includedMileageLimit: offer.mileage.included_limit,
+    mileageUnit: offer.mileage.unit,
+    depositAmount: offer.deposit?.min ?? null,
+    depositCurrency: offer.deposit?.currency ?? null,
     bookingUrl: offer.url.web,
   };
 }

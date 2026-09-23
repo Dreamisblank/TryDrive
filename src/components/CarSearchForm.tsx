@@ -4,46 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { PickupLocation } from "@/lib/locations";
 import { detectResidenceCountry } from "@/lib/currency";
+import { addDays, earliestPickupIso } from "@/lib/formatDateTime";
 import LocationAutocomplete from "./LocationAutocomplete";
-
-// Local calendar date (not toISOString, which shifts to UTC and can land
-// on the wrong day depending on the browser's timezone offset).
-function toIso(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function addDays(iso: string, days: number) {
-  const date = new Date(`${iso}T00:00:00`);
-  date.setDate(date.getDate() + days);
-  return toIso(date);
-}
-
-// A rental API may evaluate the submitted date/time server-side without a
-// timezone, so a same-timezone "tomorrow" can still land in the past
-// there. A 2-day buffer comfortably clears that kind of skew.
-function earliestPickupIso() {
-  return addDays(toIso(new Date()), 2);
-}
-
-function CalendarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4"
-    >
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M8 3v4M16 3v4M3 10h18" />
-    </svg>
-  );
-}
+import DateRangePicker from "./DateRangePicker";
 
 function UserIcon() {
   return (
@@ -85,14 +48,6 @@ export default function CarSearchForm() {
   const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
   const [driverAge, setDriverAge] = useState("25");
   const [location, setLocation] = useState<PickupLocation | null>(null);
-
-  function handlePickupDateChange(nextPickupDate: string) {
-    setPickupDate(nextPickupDate);
-    // Keep dropoff strictly after pickup instead of leaving a stale/invalid gap.
-    if (dropoffDate <= nextPickupDate) {
-      setDropoffDate(addDays(nextPickupDate, 1));
-    }
-  }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,39 +91,15 @@ export default function CarSearchForm() {
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
         <LocationAutocomplete value={location} onChange={setLocation} />
 
-        <div className="flex flex-1 flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 sm:min-w-[260px]">
-          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
-            <CalendarIcon />
-            Dates
-          </span>
-          <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-neutral-100">
-            <div className="relative">
-              <input
-                id="pickupDate"
-                name="pickupDate"
-                type="date"
-                required
-                min={earliestPickupIso()}
-                value={pickupDate}
-                onChange={(event) => handlePickupDateChange(event.target.value)}
-                className="date-pill-input w-[104px] bg-transparent outline-none [color-scheme:light]"
-              />
-            </div>
-            <span className="text-slate-400 dark:text-neutral-500">&rarr;</span>
-            <div className="relative">
-              <input
-                id="dropoffDate"
-                name="dropoffDate"
-                type="date"
-                required
-                min={addDays(pickupDate, 1)}
-                value={dropoffDate}
-                onChange={(event) => setDropoffDate(event.target.value)}
-                className="date-pill-input w-[104px] bg-transparent outline-none [color-scheme:light]"
-              />
-            </div>
-          </div>
-        </div>
+        <DateRangePicker
+          pickupDate={pickupDate}
+          dropoffDate={dropoffDate}
+          minDate={earliestPickupIso()}
+          onChange={(nextPickup, nextDropoff) => {
+            setPickupDate(nextPickup);
+            setDropoffDate(nextDropoff);
+          }}
+        />
 
         <label className="flex flex-1 cursor-text flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 text-left transition hover:bg-orange-500/5 sm:max-w-[160px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">

@@ -1,6 +1,7 @@
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
+import OfferCard from "@/components/OfferCard";
 import { searchOffers } from "@/lib/discovercars";
 import { getSelectedCurrency } from "@/lib/currencyServer";
 
@@ -69,31 +70,23 @@ export default async function SearchResultsPage({
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-6 pt-4 pb-24">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-3xl">
-          Search results
-        </h1>
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-neutral-300 sm:grid-cols-4">
-          <div>
-            <dt className="font-medium text-slate-900 dark:text-neutral-100">Location</dt>
-            <dd>{location || "—"}</dd>
-          </div>
-          <div>
-            <dt className="font-medium text-slate-900 dark:text-neutral-100">Pickup</dt>
-            <dd>{pickupDate || "—"}</dd>
-          </div>
-          <div>
-            <dt className="font-medium text-slate-900 dark:text-neutral-100">Dropoff</dt>
-            <dd>{dropoffDate || "—"}</dd>
-          </div>
-          <div>
-            <dt className="font-medium text-slate-900 dark:text-neutral-100">Driver age</dt>
-            <dd>{driverAge || "—"}</dd>
-          </div>
-        </dl>
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
+        <div className="flex items-baseline justify-between gap-3">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-2xl">
+            {location || "Search results"}
+          </h1>
+          {offers && (
+            <span className="shrink-0 text-sm text-slate-500 dark:text-neutral-400">
+              {offers.length} car{offers.length === 1 ? "" : "s"}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+          {pickupDate} → {dropoffDate} · Driver age {driverAge}
+        </p>
 
-        <p className="mt-4 text-sm text-slate-500 dark:text-neutral-400">
-          &ldquo;Book&rdquo; hands off to Discover Cars to finish the
+        <p className="mt-4 text-xs text-slate-400 dark:text-neutral-500">
+          &ldquo;View details&rdquo; hands off to Discover Cars to finish the
           reservation — pricing and availability are theirs to confirm at
           checkout.
         </p>
@@ -123,63 +116,9 @@ export default async function SearchResultsPage({
                 Showing the cheapest {shown.length} of {offers.length} vehicles.
               </p>
             )}
-            <div className="mt-4 flex flex-col gap-4">
-              {shown.map((offer) => (
-                <div
-                  key={offer.offerId}
-                  className="flex flex-col items-center gap-4 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-4 shadow-sm backdrop-blur-sm sm:flex-row"
-                >
-                  <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-orange-50 dark:bg-orange-950/30">
-                    {offer.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={offer.imageUrl}
-                        alt={offer.vehicleName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs text-orange-300 dark:text-orange-600">
-                        No image
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col items-center gap-1 text-center sm:items-start sm:text-left">
-                    <span className="inline-block rounded-full bg-orange-100 dark:bg-orange-900/40 px-2.5 py-0.5 text-xs font-medium text-orange-700 dark:text-orange-400">
-                      {offer.category}
-                    </span>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-neutral-100">
-                      {offer.vehicleName}
-                    </h3>
-                    <p className="text-sm text-slate-500 dark:text-neutral-400">
-                      {offer.transmission} · {offer.seats} seats
-                      {offer.unlimitedMileage && " · Unlimited mileage"}
-                    </p>
-                    <p className="text-xs text-slate-400 dark:text-neutral-500">
-                      {offer.supplierName}
-                      {offer.supplierRating !== null && ` · ${offer.supplierRating.toFixed(1)}/10`}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center gap-2 sm:items-end">
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100">
-                        {offer.currency} {offer.totalPrice.toFixed(2)}
-                      </div>
-                      {offer.freeCancellation && (
-                        <div className="text-xs text-green-600 dark:text-green-400">
-                          Free cancellation
-                        </div>
-                      )}
-                    </div>
-                    <a
-                      href={`/book/${offer.offerId}`}
-                      className="rounded-full bg-orange-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
-                    >
-                      View details
-                    </a>
-                  </div>
-                </div>
+            <div className="mt-4 flex flex-col gap-5">
+              {shown.map((offer, index) => (
+                <OfferCard key={offer.offerId} offer={offer} isBest={index === 0} />
               ))}
             </div>
           </>
