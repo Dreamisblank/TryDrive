@@ -85,12 +85,6 @@ export default async function SearchResultsPage({
           {pickupDate} → {dropoffDate} · Driver age {driverAge}
         </p>
 
-        <p className="mt-4 text-xs text-slate-400 dark:text-neutral-500">
-          &ldquo;View details&rdquo; hands off to Discover Cars to finish the
-          reservation — pricing and availability are theirs to confirm at
-          checkout.
-        </p>
-
         {!hasValidParams && (
           <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
             Run a search from the homepage to see live results.

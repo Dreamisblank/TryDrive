@@ -1,5 +1,6 @@
 import type { NormalizedOffer } from "@/lib/discovercars";
 import { formatTime, rentalDays } from "@/lib/formatDateTime";
+import { getCurrency } from "@/lib/currency";
 
 export default function OfferCard({
   offer,
@@ -56,7 +57,8 @@ export default function OfferCard({
 
         <div className="text-right">
           <div className="text-2xl font-bold text-slate-900 dark:text-neutral-100">
-            {offer.currency} {offer.totalPrice.toFixed(2)}
+            {getCurrency(offer.currency).symbol}
+            {offer.totalPrice.toFixed(2)}
           </div>
           <div className="text-xs text-slate-500 dark:text-neutral-400">
             for {days} day{days === 1 ? "" : "s"}

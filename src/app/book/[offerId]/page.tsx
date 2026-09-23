@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import { getOffer } from "@/lib/discovercars";
 import { formatShortDate, formatTime, rentalDays } from "@/lib/formatDateTime";
+import { getCurrency } from "@/lib/currency";
 
 type BookPageProps = {
   params: Promise<{ offerId: string }>;
@@ -75,7 +76,8 @@ export default async function BookPage({ params }: BookPageProps) {
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-slate-900 dark:text-neutral-100">
-                  {offer.currency} {offer.totalPrice.toFixed(2)}
+                  {getCurrency(offer.currency).symbol}
+                  {offer.totalPrice.toFixed(2)}
                 </div>
                 {offer.freeCancellation && (
                   <div className="text-xs text-green-600 dark:text-green-400">
@@ -152,7 +154,8 @@ export default async function BookPage({ params }: BookPageProps) {
                 </span>
                 {offer.depositAmount !== null && (
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
-                    {offer.depositCurrency} {offer.depositAmount.toFixed(0)} deposit
+                    {getCurrency(offer.depositCurrency ?? offer.currency).symbol}
+                    {offer.depositAmount.toFixed(0)} deposit
                   </span>
                 )}
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
@@ -162,18 +165,13 @@ export default async function BookPage({ params }: BookPageProps) {
             </div>
 
             <div className="rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-6 text-center shadow-sm">
-              <p className="text-sm text-slate-500 dark:text-neutral-400">
-                Reservations are completed on Discover Cars&apos; own
-                checkout, where they&apos;ll confirm final pricing, take
-                driver details, and handle payment.
-              </p>
               <a
                 href={offer.bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-block rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700"
+                className="inline-block rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700"
               >
-                Book on Discover Cars — {offer.currency} {offer.totalPrice.toFixed(2)}
+                Book Now
               </a>
             </div>
           </div>
