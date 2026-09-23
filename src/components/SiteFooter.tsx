@@ -11,10 +11,6 @@ export default function SiteFooter() {
         <Link href="/terms" className="hover:text-slate-600 dark:hover:text-neutral-300">
           Terms of Service
         </Link>
-        <span className="mx-1.5">·</span>
-        <Link href="/partner" className="hover:text-slate-600 dark:hover:text-neutral-300">
-          Partner
-        </Link>
       </p>
     </footer>
   );
