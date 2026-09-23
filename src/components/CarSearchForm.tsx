@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { PickupLocation } from "@/lib/locations";
+import { useEffect, useState } from "react";
+import { getLastLocation, saveLastLocation, type PickupLocation } from "@/lib/locations";
 import { detectResidenceCountry } from "@/lib/currency";
 import { addDays, earliestPickupIso } from "@/lib/formatDateTime";
 import LocationAutocomplete from "./LocationAutocomplete";
@@ -48,10 +48,29 @@ export default function CarSearchForm() {
   const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
   const [driverAge, setDriverAge] = useState("25");
   const [location, setLocation] = useState<PickupLocation | null>(null);
+  // Bumped exactly once, only when a saved location is restored below, so
+  // LocationAutocomplete remounts to show it. Deliberately NOT keyed off
+  // `location` itself - that also goes null while the user is typing (to
+  // clear the old selection), which would remount and wipe out their
+  // in-progress keystrokes.
+  const [restoreKey, setRestoreKey] = useState(0);
+
+  useEffect(() => {
+    // Restoring the last search's location once mounted - localStorage
+    // isn't available during SSR, so this can't be the initial state.
+    const last = getLastLocation();
+    if (last) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLocation(last);
+      setRestoreKey((k) => k + 1);
+    }
+  }, []);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!location) return;
+
+    saveLastLocation(location);
 
     const params = new URLSearchParams({
       location: location.name,
@@ -89,7 +108,7 @@ export default function CarSearchForm() {
       className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
-        <LocationAutocomplete value={location} onChange={setLocation} />
+        <LocationAutocomplete key={restoreKey} value={location} onChange={setLocation} />
 
         <DateRangePicker
           pickupDate={pickupDate}
