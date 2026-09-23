@@ -2,11 +2,11 @@
  * Currency selection.
  *
  * The chosen currency is stored in a plain (non-httpOnly) cookie so that both
- * the client picker and the server components that call RentSyst can read it.
- * RentSyst is the source of truth for prices: we pass the code through as its
- * `currency` query param and render back whatever currency it actually
- * returns, so an unsupported code degrades to their default rather than
- * showing wrong numbers.
+ * the client picker and whichever server-side rental API is wired in can
+ * read it. That API is the source of truth for prices: pass the code
+ * through and render back whatever currency it actually returns, so an
+ * unsupported code degrades to its default rather than showing wrong
+ * numbers.
  */
 
 export const CURRENCY_COOKIE = "trydrive_currency";
@@ -111,4 +111,31 @@ export function detectCurrency(): string {
   }
 
   return DEFAULT_CURRENCY;
+}
+
+const DEFAULT_RESIDENCE_COUNTRY = "GB";
+
+/**
+ * Best-effort guess at the visitor's country of residence (ISO 3166-1
+ * alpha-2), for APIs that price/localize by driver residence rather than
+ * currency. Same no-network approach as detectCurrency(), kept separate
+ * since several countries share a currency but not a residence code.
+ */
+export function detectResidenceCountry(): string {
+  if (typeof navigator === "undefined") return DEFAULT_RESIDENCE_COUNTRY;
+
+  for (const tag of navigator.languages ?? [navigator.language]) {
+    const region = tag?.split("-")[1]?.toUpperCase();
+    if (region) return region;
+  }
+
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const country = TIMEZONE_TO_COUNTRY[tz];
+    if (country) return country;
+  } catch {
+    // Intl unavailable — fall through to the default.
+  }
+
+  return DEFAULT_RESIDENCE_COUNTRY;
 }

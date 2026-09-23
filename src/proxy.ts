@@ -12,9 +12,6 @@ import {
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   // Brute-forcing ADMIN_PASSWORD is the main risk here - keep this tight.
   "/api/admin/login": { limit: 5, windowMs: 10 * 60 * 1000 },
-  // Booking is already blocked from creating a real order (see
-  // BOOKINGS_ENABLED in the route), but still worth capping abuse/spam.
-  "/api/booking": { limit: 10, windowMs: 60 * 1000 },
 };
 
 type Bucket = { count: number; resetAt: number };
@@ -79,5 +76,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/login", "/api/booking"],
+  matcher: ["/admin/:path*", "/api/admin/login"],
 };

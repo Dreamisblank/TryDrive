@@ -4,16 +4,8 @@ import HeroHeadline from "@/components/HeroHeadline";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
-import { getLocations } from "@/lib/rentsyst";
 
-export default async function Home() {
-  let locations: Awaited<ReturnType<typeof getLocations>> = [];
-  try {
-    locations = await getLocations();
-  } catch (err) {
-    console.error("Failed to load RentSyst locations:", err);
-  }
-
+export default function Home() {
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
       <SkyBackground />
@@ -24,7 +16,7 @@ export default async function Home() {
         <HeroHeadline />
 
         <div className="mt-10 w-full">
-          <CarSearchForm locations={locations} />
+          <CarSearchForm />
         </div>
       </main>
 

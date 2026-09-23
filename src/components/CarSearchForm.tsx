@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { RentSystLocation } from "@/lib/rentsyst";
+import type { PickupLocation } from "@/lib/locations";
+import { detectResidenceCountry } from "@/lib/currency";
 import LocationAutocomplete from "./LocationAutocomplete";
 
 // Local calendar date (not toISOString, which shifts to UTC and can land
@@ -20,9 +21,9 @@ function addDays(iso: string, days: number) {
   return toIso(date);
 }
 
-// RentSyst evaluates the submitted date/time server-side without a
+// A rental API may evaluate the submitted date/time server-side without a
 // timezone, so a same-timezone "tomorrow" can still land in the past
-// there. A 2-day buffer comfortably clears that skew.
+// there. A 2-day buffer comfortably clears that kind of skew.
 function earliestPickupIso() {
   return addDays(toIso(new Date()), 2);
 }
@@ -78,18 +79,12 @@ function SearchIcon() {
   );
 }
 
-export default function CarSearchForm({
-  locations,
-}: {
-  locations: RentSystLocation[];
-}) {
+export default function CarSearchForm() {
   const router = useRouter();
   const [pickupDate, setPickupDate] = useState(earliestPickupIso());
   const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
   const [driverAge, setDriverAge] = useState("25");
-  const [locationId, setLocationId] = useState(() =>
-    locations[0] ? String(locations[0].id) : "",
-  );
+  const [location, setLocation] = useState<PickupLocation | null>(null);
 
   function handlePickupDateChange(nextPickupDate: string) {
     setPickupDate(nextPickupDate);
@@ -101,24 +96,24 @@ export default function CarSearchForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const selected = locations.find((loc) => String(loc.id) === locationId);
-    if (!selected) return;
+    if (!location) return;
 
     const params = new URLSearchParams({
-      location: selected.name,
-      locationId: String(selected.id),
-      lat: String(selected.latitude),
-      lng: String(selected.longitude),
+      location: location.name,
       pickupDate,
       dropoffDate,
       driverAge,
+      residence: detectResidenceCountry(),
+      ...(location.iata ? { iata: location.iata } : {}),
+      ...(location.latitude != null ? { lat: String(location.latitude) } : {}),
+      ...(location.longitude != null ? { lng: String(location.longitude) } : {}),
     });
     const destination = `/search?${params.toString()}`;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || location.latitude == null || location.longitude == null) {
       router.push(destination);
       return;
     }
@@ -127,7 +122,7 @@ export default function CarSearchForm({
     // navigating, rather than cutting away mid-animation.
     window.dispatchEvent(
       new CustomEvent("trydrive:zoom-search", {
-        detail: { lat: selected.latitude, lng: selected.longitude },
+        detail: { lat: location.latitude, lng: location.longitude },
       }),
     );
     setTimeout(() => router.push(destination), 650);
@@ -139,11 +134,7 @@ export default function CarSearchForm({
       className="mx-auto w-full max-w-4xl rounded-[28px] border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-2 shadow-[0_20px_60px_-15px_rgba(234,88,12,0.35)] backdrop-blur-xl sm:rounded-full"
     >
       <div className="flex flex-col divide-y divide-slate-900/10 sm:flex-row sm:items-stretch sm:divide-x sm:divide-y-0">
-        <LocationAutocomplete
-          locations={locations}
-          value={locationId}
-          onChange={setLocationId}
-        />
+        <LocationAutocomplete value={location} onChange={setLocation} />
 
         <div className="flex flex-1 flex-col justify-center gap-0.5 rounded-full px-5 py-2.5 sm:min-w-[260px]">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-neutral-400">
@@ -200,7 +191,7 @@ export default function CarSearchForm({
         <div className="flex items-center justify-center p-1.5 sm:pl-1.5">
           <button
             type="submit"
-            disabled={locations.length === 0}
+            disabled={!location}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <SearchIcon />

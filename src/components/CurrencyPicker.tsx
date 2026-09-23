@@ -71,7 +71,7 @@ export default function CurrencyPicker() {
     if (code === current) return;
     writeCurrencyCookie(code);
     setCurrent(code);
-    // Prices come from RentSyst server-side, so re-fetch rather than
+    // Prices come from a server-side rental API, so re-fetch rather than
     // converting in the browser.
     router.refresh();
   }

@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { CURRENCY_COOKIE, normalizeCurrency } from "./currency";
 
 /**
- * The visitor's chosen currency, for pages that price against RentSyst.
+ * The visitor's chosen currency, for pages that price against a rental API.
  * Kept out of `currency.ts` so that module stays importable from client
  * components.
  */
