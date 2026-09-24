@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-neutral-100">
           Terms of Service
         </h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-neutral-400">Last updated: 17/08/2026</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-neutral-400">Last updated: 24/09/2026</p>
 
         <H2>1. About TryDrive</H2>
         <P>
@@ -61,8 +61,8 @@ export default function TermsOfServicePage() {
           location, dates, and driver age, and displays results sourced from
           third-party car rental companies and platforms
           (&ldquo;Partners&rdquo;). When you select a result, you will be
-          directed to a Partner&apos;s website or platform to view full
-          pricing, terms, and to complete any booking.
+          directed to a Partner&apos;s own website to view full pricing and
+          terms, and to complete your booking directly with them.
         </P>
         <P>
           TryDrive does not process bookings, take payments, or act as a
@@ -83,8 +83,8 @@ export default function TermsOfServicePage() {
             car rental option available at your search location.
           </li>
           <li>
-            Prices, availability, and vehicle details are supplied by third
-            parties and may change, be inaccurate, or become unavailable
+            Prices, availability, and vehicle details are supplied by our
+            Partners and may change, be inaccurate, or become unavailable
             without notice.
           </li>
           <li>
@@ -141,8 +141,10 @@ export default function TermsOfServicePage() {
           <li>Any acts, omissions, or terms of any third-party rental company.</li>
         </UL>
         <P>
-          Any complaint or claim regarding a specific rental must be directed
-          to the rental company or platform you booked with.
+          Once you leave our site to complete a booking, TryDrive has no
+          visibility or control over that transaction. Any complaint or claim
+          regarding a specific rental must be directed to the rental company
+          or platform you booked with.
         </P>
 
         <H2>7. Use of the Site</H2>
@@ -159,6 +161,11 @@ export default function TermsOfServicePage() {
           consequential loss arising from your use of the site. Our total
           liability for any claim arising from your use of TryDrive is
           limited to £100.
+        </P>
+        <P>
+          Nothing in these Terms excludes or limits liability that cannot
+          lawfully be excluded or limited under UK law, including liability
+          for death or personal injury caused by negligence, or fraud.
         </P>
 
         <H2>9. Changes to These Terms</H2>

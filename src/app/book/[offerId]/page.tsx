@@ -187,7 +187,15 @@ export default async function BookPage({ params }: BookPageProps) {
         />
       )}
 
-      <SiteFooter liftedOnMobile={Boolean(offer)} />
+      {/* Extra clearance below the footer on mobile only: BookingBar spans
+          the full width there (fixed bottom-0), and SiteFooter is back in
+          normal document flow, so without this the footer would scroll to
+          rest right underneath the bar. Desktop's bar is a centered pill
+          that never reaches the left edge, so it never covers the footer
+          there - no clearance needed. */}
+      <div className={offer ? "pb-24 sm:pb-0" : undefined}>
+        <SiteFooter />
+      </div>
     </div>
   );
 }

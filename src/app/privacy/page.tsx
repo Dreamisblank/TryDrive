@@ -44,7 +44,7 @@ export default function PrivacyPolicyPage() {
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-neutral-100">
           Privacy Policy
         </h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-neutral-400">Last updated: 17/08/2026</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-neutral-400">Last updated: 24/09/2026</p>
 
         <P>
           TryDrive is operated by Refine Labs Ltd (&ldquo;we&rdquo;,
@@ -60,14 +60,20 @@ export default function PrivacyPolicyPage() {
             driver age entered into our search form.
           </li>
           <li>
+            <strong>Click/referral data:</strong> if you click through to a
+            Partner, we record that a referral occurred, for commission
+            attribution purposes. We do not see or collect what happens on
+            the Partner&apos;s site afterward, including any personal or
+            payment details you provide there.
+          </li>
+          <li>
             <strong>Usage data:</strong> pages visited, clicks, general
             device/browser information, and approximate location (via IP),
             collected through analytics tools.
           </li>
           <li>
             <strong>Cookies:</strong> used for basic site functionality and to
-            track affiliate referrals when you click through to a Partner
-            (see Section 4).
+            track affiliate referrals when you click through to a Partner.
           </li>
         </UL>
         <P>
@@ -110,8 +116,8 @@ export default function PrivacyPolicyPage() {
             <strong>Affiliate networks and Partners,</strong> to attribute a
             booking or click to TryDrive for commission purposes. This
             typically involves a referral ID and click timestamp, not
-            personal details, unless you proceed to book directly with the
-            Partner (at which point their own privacy policy applies).
+            personal details, since you provide those directly to the
+            Partner on their own site if you proceed to book.
           </li>
           <li>
             <strong>Analytics providers,</strong> to understand site usage.
