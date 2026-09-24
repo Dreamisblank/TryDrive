@@ -1,4 +1,5 @@
 import BackLink from "@/components/BackLink";
+import BookingBar from "@/components/BookingBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
@@ -30,7 +31,7 @@ export default async function BookPage({ params }: BookPageProps) {
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 lg:max-w-4xl">
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-32 lg:max-w-4xl lg:pb-28">
         <BackLink />
 
         {error && (
@@ -172,22 +173,21 @@ export default async function BookPage({ params }: BookPageProps) {
               pickupLocationName={offer.pickupLocationName}
               supplierName={offer.supplierName}
             />
-
-            <div className="rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-6 text-center shadow-sm">
-              <a
-                href={offer.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700"
-              >
-                Book Now
-              </a>
-            </div>
           </div>
         )}
       </main>
 
-      <SiteFooter />
+      {offer && (
+        <BookingBar
+          bookingUrl={offer.bookingUrl}
+          depositAmount={offer.depositAmount}
+          depositCurrency={offer.depositCurrency}
+          currency={offer.currency}
+          shareTitle={`${offer.vehicleName} · ${getCurrency(offer.currency).symbol}${offer.totalPrice.toFixed(2)} on TryDrive`}
+        />
+      )}
+
+      <SiteFooter liftedOnMobile={Boolean(offer)} />
     </div>
   );
 }

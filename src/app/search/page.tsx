@@ -92,16 +92,21 @@ export default async function SearchResultsPage({
       <SiteHeader />
 
       {/* Desktop only, per design: mobile keeps "Start a new search" via the
-          header/back nav instead of a pinned form eating scroll space. */}
+          header/back nav instead of a pinned form eating scroll space. Uses
+          md rather than lg: a browser window that looks "wide" can still
+          report a CSS viewport under 1024px (scaled displays, a
+          non-maximized window), so md is the safer cutoff for "this is
+          really a desktop view" - matches the breakpoint OfferCard's row
+          layout switches on. */}
       {initialSearch && (
-        <div className="sticky top-0 z-20 hidden py-4 lg:block">
+        <div className="sticky top-0 z-20 hidden py-4 md:block">
           <div className="mx-auto max-w-5xl px-6">
             <CarSearchForm initial={initialSearch} />
           </div>
         </div>
       )}
 
-      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 lg:max-w-5xl">
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 md:max-w-5xl">
         <div className="flex items-baseline justify-between gap-3">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-2xl">
             {location || "Search results"}

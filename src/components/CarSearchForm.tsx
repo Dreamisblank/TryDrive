@@ -110,6 +110,12 @@ export default function CarSearchForm({ initial }: CarSearchFormProps) {
     });
     const destination = `/search?${params.toString()}`;
 
+    // Signals the background globe to spin up and shrink while the results
+    // page's own server-side offer search is in flight - the only visible
+    // "loading" cue available here, since navigation replaces this whole
+    // page (there's no separate spinner to show on top of it).
+    window.dispatchEvent(new CustomEvent("trydrive:search-loading"));
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;

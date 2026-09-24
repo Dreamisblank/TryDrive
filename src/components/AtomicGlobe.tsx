@@ -41,6 +41,18 @@ const ZOOM_CAMERA_Z = 2.4;
 const IDLE_CAMERA_Z = 3.3;
 const FLIGHT_PULSE_SPEED = 0.18; // fraction of arc traveled per second
 
+// Search-loading cue: while the results page's offer search is in flight,
+// ramp the idle spin up to a genuinely fast spin and shrink the globe
+// toward half size - a visible "working on it" signal on a page that has
+// nowhere else to put a spinner, since navigating away unmounts this
+// component entirely (no separate "stop" state is needed for the same
+// reason). A flat multiplier on the idle speed reads as barely-faster
+// idle drift, not a spin - this is a target speed in its own right instead:
+// ~1 full rotation per second at the peak of the ramp.
+const LOADING_SPIN_SPEED = 6.3; // radians/sec (~1 rotation/sec)
+const LOADING_RAMP_MS = 900;
+const LOADING_MIN_SCALE = 0.5;
+
 function createGlowSprite(): THREE.CanvasTexture {
   const size = 128;
   const canvas = document.createElement("canvas");
@@ -184,6 +196,7 @@ export default function AtomicGlobe() {
     let zoomFromRotationY = globeGroup.rotation.y;
     let zoomToRotationY = globeGroup.rotation.y;
     let zoomFromZ = camera.position.z;
+    let loadingStart: number | null = null;
 
     function onZoomRequest(event: Event) {
       const detail = (event as CustomEvent<{ lat: number; lng: number }>)
@@ -211,13 +224,28 @@ export default function AtomicGlobe() {
       zoomStart = performance.now();
     }
 
+    function onSearchLoading() {
+      loadingStart = performance.now();
+    }
+
     if (!prefersReducedMotion) {
       window.addEventListener("trydrive:zoom-search", onZoomRequest);
+      window.addEventListener("trydrive:search-loading", onSearchLoading);
     }
 
     function animate(now: number) {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
+
+      let rotateSpeed = IDLE_ROTATE_SPEED;
+      let scale = 1;
+      if (loadingStart !== null) {
+        const loadingT = Math.min(1, (now - loadingStart) / LOADING_RAMP_MS);
+        const loadingEased = easeOutCubic(loadingT);
+        rotateSpeed = IDLE_ROTATE_SPEED + loadingEased * (LOADING_SPIN_SPEED - IDLE_ROTATE_SPEED);
+        scale = 1 - loadingEased * (1 - LOADING_MIN_SCALE);
+      }
+      globeGroup.scale.setScalar(scale);
 
       if (zoomStart !== null) {
         const t = Math.min(1, (now - zoomStart) / ZOOM_DURATION_MS);
@@ -227,7 +255,7 @@ export default function AtomicGlobe() {
         camera.position.z = zoomFromZ + (ZOOM_CAMERA_Z - zoomFromZ) * eased;
         if (t >= 1) zoomStart = null;
       } else if (!prefersReducedMotion) {
-        globeGroup.rotation.y += dt * IDLE_ROTATE_SPEED;
+        globeGroup.rotation.y += dt * rotateSpeed;
       }
 
       if (!prefersReducedMotion) {
@@ -257,6 +285,7 @@ export default function AtomicGlobe() {
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       window.removeEventListener("trydrive:zoom-search", onZoomRequest);
+      window.removeEventListener("trydrive:search-loading", onSearchLoading);
       geometry.dispose();
       material.dispose();
       sprite.dispose();

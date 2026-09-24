@@ -14,7 +14,7 @@ export default function OfferCard({
   return (
     <>
       <div
-        className={`relative rounded-3xl border bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:bg-neutral-900/80 lg:hidden ${
+        className={`relative rounded-3xl border bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:bg-neutral-900/80 md:hidden ${
           isBest
             ? "border-orange-300 ring-1 ring-orange-200 dark:border-orange-700 dark:ring-orange-900/40"
             : "border-orange-900/5 dark:border-neutral-700/60"
@@ -159,15 +159,17 @@ export default function OfferCard({
 
 /** Long, thin desktop row - mirrors a flight-search result layout (identity,
  *  route/timeline, price + CTA all on one line) while keeping the mobile
- *  card above untouched below the lg breakpoint. Column widths are kept
- *  deliberately narrow and summed against the lg-breakpoint container width
- *  so nothing wraps or clips at 1024px. */
+ *  card above untouched below the md breakpoint. Column widths are kept
+ *  deliberately narrow and summed against the md-breakpoint container width
+ *  so nothing wraps or clips at 768px - a "wide-looking" window can still
+ *  have a CSS viewport under 1024px (scaled displays, a non-maximized
+ *  window), so md is the safer cutoff for "this is really a desktop view". */
 function OfferRow({ offer, isBest }: { offer: NormalizedOffer; isBest: boolean }) {
   const days = rentalDays(offer.pickupAt, offer.dropoffAt);
 
   return (
     <div
-      className={`relative hidden items-center gap-5 rounded-2xl border bg-white/90 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-neutral-900/80 lg:flex ${
+      className={`relative hidden items-center gap-4 rounded-2xl border bg-white/90 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-neutral-900/80 md:flex ${
         isBest
           ? "border-orange-300 ring-1 ring-orange-200 dark:border-orange-700 dark:ring-orange-900/40"
           : "border-orange-900/5 dark:border-neutral-700/60"
@@ -182,8 +184,8 @@ function OfferRow({ offer, isBest }: { offer: NormalizedOffer; isBest: boolean }
       {/* Vehicle identity - thumbnail + name carries the row, the way an
           airline logo + name does in a flight row; supplier and specs fold
           into one subtitle line underneath instead of their own column. */}
-      <div className="flex w-64 shrink-0 items-center gap-3">
-        <div className="flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 p-1 dark:bg-orange-950/30">
+      <div className="flex w-52 shrink-0 items-center gap-2.5">
+        <div className="flex h-11 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 p-1 dark:bg-orange-950/30">
           {offer.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -250,7 +252,7 @@ function OfferRow({ offer, isBest }: { offer: NormalizedOffer; isBest: boolean }
 
       {/* Price + CTA - same top-right position as the mobile card, just
           stacked at the end of the row instead. */}
-      <div className="flex w-32 shrink-0 flex-col items-end gap-2">
+      <div className="flex w-28 shrink-0 flex-col items-end gap-2">
         <div className="text-right">
           <div className="text-lg font-bold whitespace-nowrap text-slate-900 dark:text-neutral-100">
             {getCurrency(offer.currency).symbol}
