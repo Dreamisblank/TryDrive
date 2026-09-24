@@ -155,10 +155,10 @@ export default function MobileFilterBar({
               aria-expanded={open === pill.panel}
               aria-haspopup="listbox"
               onClick={() => setOpen(open === pill.panel ? null : pill.panel)}
-              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium whitespace-nowrap shadow-sm transition ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium whitespace-nowrap transition ${
                 pill.active
                   ? "border-orange-600 bg-orange-600 text-white"
-                  : "border-orange-900/10 bg-white/95 text-slate-800 backdrop-blur-sm dark:border-neutral-700 dark:bg-neutral-900/95 dark:text-neutral-100"
+                  : "border-slate-200 bg-white text-slate-800 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
               }`}
             >
               {pill.label}
