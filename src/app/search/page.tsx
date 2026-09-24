@@ -1,13 +1,13 @@
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
-import OfferCard from "@/components/OfferCard";
 import CarSearchForm from "@/components/CarSearchForm";
+import SearchResults from "@/components/SearchResults";
 import { searchOffers } from "@/lib/discovercars";
 import { getSelectedCurrency } from "@/lib/currencyServer";
+import { getCurrency } from "@/lib/currency";
+import { FILTER_STORAGE_PREFIX, toResultOffer } from "@/lib/offerFilters";
 import type { PickupLocation } from "@/lib/locations";
-
-const MAX_RESULTS_SHOWN = 40;
 
 type SearchPageProps = {
   searchParams: Promise<{
@@ -46,6 +46,7 @@ export default async function SearchResultsPage({
     parsedAge > 0 &&
     (iata || (parsedLat !== undefined && parsedLng !== undefined));
 
+  const currency = await getSelectedCurrency();
   let offers: Awaited<ReturnType<typeof searchOffers>> | null = null;
   let error: string | null = null;
 
@@ -57,15 +58,13 @@ export default async function SearchResultsPage({
         dropoffAt: `${dropoffDate}T10:00:00`,
         driverAge: parsedAge,
         driverResidence: residence!,
-        currency: await getSelectedCurrency(),
+        currency,
       });
     } catch (err) {
       console.error("Discover Cars offer search failed:", err);
       error = "Couldn't reach the search provider. Please try again.";
     }
   }
-
-  const shown = offers?.slice(0, MAX_RESULTS_SHOWN) ?? null;
 
   // Only meaningful when hasValidParams is true - reflects the query that
   // actually produced these results, so the sticky desktop search bar never
@@ -86,40 +85,33 @@ export default async function SearchResultsPage({
         }
       : undefined;
 
+  const filterStorageKey = `${FILTER_STORAGE_PREFIX}${iata ?? `${parsedLat},${parsedLng}`}:${pickupDate}:${dropoffDate}:${driverAge}`;
+
   return (
     <div className="flex-1">
       <SkyBackground />
       <SiteHeader />
 
-      {/* Desktop only, per design: mobile keeps "Start a new search" via the
-          header/back nav instead of a pinned form eating scroll space. Uses
-          md rather than lg: a browser window that looks "wide" can still
-          report a CSS viewport under 1024px (scaled displays, a
-          non-maximized window), so md is the safer cutoff for "this is
-          really a desktop view" - matches the breakpoint OfferCard's row
-          layout switches on. */}
+      {/* Desktop only: mobile keeps "Start a new search" via the header/back
+          nav instead of a pinned form eating scroll space. */}
       {initialSearch && (
-        <div className="sticky top-0 z-20 hidden py-4 md:block">
+        <div className="sticky top-0 z-20 hidden py-4 desktop:block">
           <div className="mx-auto max-w-5xl px-6">
             <CarSearchForm initial={initialSearch} />
           </div>
         </div>
       )}
 
-      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 md:max-w-5xl">
-        <div className="flex items-baseline justify-between gap-3">
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 desktop:max-w-5xl">
+        {/* The search bar above already shows all of this on desktop. */}
+        <div className="desktop:hidden">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-2xl">
             {location || "Search results"}
           </h1>
-          {offers && (
-            <span className="shrink-0 text-sm text-slate-500 dark:text-neutral-400">
-              {offers.length} car{offers.length === 1 ? "" : "s"}
-            </span>
-          )}
+          <p className="mt-1 text-sm text-slate-500 dark:text-neutral-400">
+            {pickupDate} → {dropoffDate} · Driver age {driverAge}
+          </p>
         </div>
-        <p className="mt-1 text-sm text-slate-500 dark:text-neutral-400">
-          {pickupDate} → {dropoffDate} · Driver age {driverAge}
-        </p>
 
         {!hasValidParams && (
           <div className="mt-10 rounded-3xl border border-dashed border-orange-300 dark:border-orange-800 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-slate-500 dark:text-neutral-400 backdrop-blur-sm">
@@ -139,19 +131,16 @@ export default async function SearchResultsPage({
           </div>
         )}
 
-        {offers && offers.length > 0 && shown && (
-          <>
-            {offers.length > shown.length && (
-              <p className="mt-6 text-sm text-slate-500 dark:text-neutral-400">
-                Showing the cheapest {shown.length} of {offers.length} vehicles.
-              </p>
-            )}
-            <div className="mt-4 flex flex-col gap-5">
-              {shown.map((offer, index) => (
-                <OfferCard key={offer.offerId} offer={offer} isBest={index === 0} />
-              ))}
-            </div>
-          </>
+        {offers && offers.length > 0 && (
+          // Keyed by the search: a new search from the sticky bar reuses
+          // this page, and without a new key it would keep the previous
+          // search's filters instead of opening on the defaults.
+          <SearchResults
+            key={filterStorageKey}
+            offers={offers.map(toResultOffer)}
+            currencySymbol={getCurrency(currency).symbol}
+            storageKey={filterStorageKey}
+          />
         )}
       </main>
 

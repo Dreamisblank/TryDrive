@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getLastSearch, saveLastSearch, type PickupLocation } from "@/lib/locations";
 import { detectResidenceCountry } from "@/lib/currency";
 import { addDays, earliestPickupIso } from "@/lib/formatDateTime";
+import { clearStoredFilters } from "@/lib/offerFilters";
 import LocationAutocomplete from "./LocationAutocomplete";
 import DateRangePicker from "./DateRangePicker";
 
@@ -97,6 +98,7 @@ export default function CarSearchForm({ initial }: CarSearchFormProps) {
     if (!location) return;
 
     saveLastSearch({ location, pickupDate, dropoffDate, driverAge });
+    clearStoredFilters();
 
     const params = new URLSearchParams({
       location: location.name,

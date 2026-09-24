@@ -14,6 +14,13 @@
   --foreground: #e5e5e5;
 }
 
+/* Results-page desktop layout (filter sidebar + one-line result rows). Sits
+   between md and lg: the sidebar and rows don't fit side by side at 768px,
+   but plenty of laptop windows report a CSS width under lg's 1024px. */
+@theme {
+  --breakpoint-desktop: 52rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

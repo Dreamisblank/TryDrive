@@ -150,6 +150,7 @@ export type NormalizedOffer = {
   category: string;
   transmission: string;
   seats: number;
+  bags: number;
   fuel: string;
   imageUrl: string | null;
   supplierName: string;
@@ -178,6 +179,7 @@ function normalizeOffer(offer: DiscoverCarsOffer): NormalizedOffer {
     category: offer.car.category,
     transmission: offer.car.transmission,
     seats: offer.car.seats,
+    bags: offer.car.bags,
     fuel: offer.car.fuel,
     imageUrl: offer.car.image,
     supplierName: offer.supplier.name,
