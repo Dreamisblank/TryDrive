@@ -1,10 +1,12 @@
-import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import { getOffer } from "@/lib/discovercars";
 import { formatShortDate, formatTime, rentalDays } from "@/lib/formatDateTime";
 import { getCurrency } from "@/lib/currency";
+import PriceComparisonBox from "@/components/PriceComparisonBox";
+import TerminalTransferBox from "@/components/TerminalTransferBox";
 
 type BookPageProps = {
   params: Promise<{ offerId: string }>;
@@ -28,13 +30,8 @@ export default async function BookPage({ params }: BookPageProps) {
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
-        <Link
-          href="/"
-          className="text-sm font-medium text-orange-700 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
-        >
-          ← Start a new search
-        </Link>
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 lg:max-w-4xl">
+        <BackLink />
 
         {error && (
           <div className="mt-8 rounded-3xl border border-dashed border-red-300 dark:border-red-900/50 bg-white/70 dark:bg-neutral-900/60 p-10 text-center text-red-600 dark:text-red-400 backdrop-blur-sm">
@@ -51,13 +48,13 @@ export default async function BookPage({ params }: BookPageProps) {
         {offer && (
           <div className="mt-6 flex flex-col gap-6">
             <div className="flex flex-col gap-4 rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-5 shadow-sm sm:flex-row sm:items-center">
-              <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-orange-50 dark:bg-orange-950/30">
+              <div className="flex h-28 w-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-orange-50 p-2 dark:bg-orange-950/30">
                 {offer.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={offer.imageUrl}
                     alt={offer.vehicleName}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 ) : (
                   <span className="text-xs text-orange-300 dark:text-orange-600">No image</span>
@@ -163,6 +160,18 @@ export default async function BookPage({ params }: BookPageProps) {
                 </span>
               </div>
             </div>
+
+            <PriceComparisonBox
+              offerId={offer.offerId}
+              category={offer.category}
+              totalPrice={offer.totalPrice}
+              currency={offer.currency}
+            />
+
+            <TerminalTransferBox
+              pickupLocationName={offer.pickupLocationName}
+              supplierName={offer.supplierName}
+            />
 
             <div className="rounded-3xl border border-orange-900/5 dark:border-neutral-700/60 bg-white/90 dark:bg-neutral-900/80 p-6 text-center shadow-sm">
               <a

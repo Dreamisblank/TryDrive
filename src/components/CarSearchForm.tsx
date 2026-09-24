@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getLastLocation, saveLastLocation, type PickupLocation } from "@/lib/locations";
+import { getLastSearch, saveLastSearch, type PickupLocation } from "@/lib/locations";
 import { detectResidenceCountry } from "@/lib/currency";
 import { addDays, earliestPickupIso } from "@/lib/formatDateTime";
 import LocationAutocomplete from "./LocationAutocomplete";
@@ -42,13 +42,31 @@ function SearchIcon() {
   );
 }
 
-export default function CarSearchForm() {
+type CarSearchFormProps = {
+  /** When provided (e.g. the search results page reflecting the query that
+   *  actually ran), these seed the form instead of restoring from
+   *  localStorage - so the form always mirrors what's really on screen. */
+  initial?: {
+    location: PickupLocation;
+    pickupDate: string;
+    dropoffDate: string;
+    driverAge: string;
+  };
+};
+
+export default function CarSearchForm({ initial }: CarSearchFormProps) {
   const router = useRouter();
-  const [pickupDate, setPickupDate] = useState(earliestPickupIso());
-  const [dropoffDate, setDropoffDate] = useState(addDays(earliestPickupIso(), 3));
-  const [driverAge, setDriverAge] = useState("25");
-  const [location, setLocation] = useState<PickupLocation | null>(null);
-  // Bumped exactly once, only when a saved location is restored below, so
+  const [pickupDate, setPickupDate] = useState(
+    initial?.pickupDate ?? earliestPickupIso(),
+  );
+  const [dropoffDate, setDropoffDate] = useState(
+    initial?.dropoffDate ?? addDays(earliestPickupIso(), 3),
+  );
+  const [driverAge, setDriverAge] = useState(initial?.driverAge ?? "25");
+  const [location, setLocation] = useState<PickupLocation | null>(
+    initial?.location ?? null,
+  );
+  // Bumped exactly once, only when a saved search is restored below, so
   // LocationAutocomplete remounts to show it. Deliberately NOT keyed off
   // `location` itself - that also goes null while the user is typing (to
   // clear the old selection), which would remount and wipe out their
@@ -56,21 +74,29 @@ export default function CarSearchForm() {
   const [restoreKey, setRestoreKey] = useState(0);
 
   useEffect(() => {
-    // Restoring the last search's location once mounted - localStorage
-    // isn't available during SSR, so this can't be the initial state.
-    const last = getLastLocation();
+    // Already seeded from an explicit initial search - don't stomp it with
+    // an older localStorage entry.
+    if (initial) return;
+
+    // Restoring the last search once mounted - localStorage isn't available
+    // during SSR, so this can't be the initial state.
+    const last = getLastSearch();
     if (last) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLocation(last);
+      setLocation(last.location);
+      setPickupDate(last.pickupDate);
+      setDropoffDate(last.dropoffDate);
+      setDriverAge(last.driverAge);
       setRestoreKey((k) => k + 1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!location) return;
 
-    saveLastLocation(location);
+    saveLastSearch({ location, pickupDate, dropoffDate, driverAge });
 
     const params = new URLSearchParams({
       location: location.name,

@@ -2,8 +2,10 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SkyBackground from "@/components/SkyBackground";
 import OfferCard from "@/components/OfferCard";
+import CarSearchForm from "@/components/CarSearchForm";
 import { searchOffers } from "@/lib/discovercars";
 import { getSelectedCurrency } from "@/lib/currencyServer";
+import type { PickupLocation } from "@/lib/locations";
 
 const MAX_RESULTS_SHOWN = 40;
 
@@ -65,12 +67,41 @@ export default async function SearchResultsPage({
 
   const shown = offers?.slice(0, MAX_RESULTS_SHOWN) ?? null;
 
+  // Only meaningful when hasValidParams is true - reflects the query that
+  // actually produced these results, so the sticky desktop search bar never
+  // shows something out of sync with what's on screen.
+  const initialSearch =
+    hasValidParams && location
+      ? {
+          location: {
+            id: iata ?? `${parsedLat},${parsedLng}`,
+            name: location,
+            iata,
+            latitude: parsedLat,
+            longitude: parsedLng,
+          } satisfies PickupLocation,
+          pickupDate: pickupDate!,
+          dropoffDate: dropoffDate!,
+          driverAge: driverAge!,
+        }
+      : undefined;
+
   return (
     <div className="flex-1">
       <SkyBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24">
+      {/* Desktop only, per design: mobile keeps "Start a new search" via the
+          header/back nav instead of a pinned form eating scroll space. */}
+      {initialSearch && (
+        <div className="sticky top-0 z-20 hidden py-4 lg:block">
+          <div className="mx-auto max-w-5xl px-6">
+            <CarSearchForm initial={initialSearch} />
+          </div>
+        </div>
+      )}
+
+      <main className="mx-auto max-w-3xl px-6 pt-4 pb-24 lg:max-w-5xl">
         <div className="flex items-baseline justify-between gap-3">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-neutral-100 sm:text-2xl">
             {location || "Search results"}

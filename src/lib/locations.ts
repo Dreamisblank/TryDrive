@@ -16,32 +16,43 @@ export type PickupLocation = {
   iata?: string;
 };
 
-const LAST_LOCATION_KEY = "trydrive_last_location";
+const LAST_SEARCH_KEY = "trydrive_last_search";
 
-/** Remembers the last location someone actually searched, so the search
- *  bar can pre-fill it when they come back to the homepage. Browser-only -
- *  callers must only touch this after mount. */
-export function saveLastLocation(location: PickupLocation): void {
+export type LastSearch = {
+  location: PickupLocation;
+  pickupDate: string;
+  dropoffDate: string;
+  driverAge: string;
+};
+
+/** Remembers the last search someone actually ran (location, dates, driver
+ *  age), so the search bar can pre-fill it when they come back. Browser-only
+ *  - callers must only touch this after mount. */
+export function saveLastSearch(search: LastSearch): void {
   try {
-    localStorage.setItem(LAST_LOCATION_KEY, JSON.stringify(location));
+    localStorage.setItem(LAST_SEARCH_KEY, JSON.stringify(search));
   } catch {
     // Storage unavailable (private browsing, disabled) - non-fatal, the
     // search bar just won't remember it next time.
   }
 }
 
-export function getLastLocation(): PickupLocation | null {
+export function getLastSearch(): LastSearch | null {
   try {
-    const raw = localStorage.getItem(LAST_LOCATION_KEY);
+    const raw = localStorage.getItem(LAST_SEARCH_KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (
       parsed &&
       typeof parsed === "object" &&
-      typeof (parsed as PickupLocation).id === "string" &&
-      typeof (parsed as PickupLocation).name === "string"
+      typeof (parsed as LastSearch).location === "object" &&
+      typeof (parsed as LastSearch).location?.id === "string" &&
+      typeof (parsed as LastSearch).location?.name === "string" &&
+      typeof (parsed as LastSearch).pickupDate === "string" &&
+      typeof (parsed as LastSearch).dropoffDate === "string" &&
+      typeof (parsed as LastSearch).driverAge === "string"
     ) {
-      return parsed as PickupLocation;
+      return parsed as LastSearch;
     }
     return null;
   } catch {
