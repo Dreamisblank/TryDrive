@@ -112,6 +112,11 @@ export default function TermsOfServicePage() {
           Our commercial relationships with Partners may influence which
           options are displayed or how they are ordered.
         </P>
+        <P>
+          TryDrive is an affiliate of Discover Car Hire AS (DiscoverCars.com).
+          Car rental results on TryDrive are supplied through DiscoverCars.com,
+          and bookings are completed on DiscoverCars.com&apos;s own website.
+        </P>
 
         <H2>5. Driver Age and Eligibility</H2>
         <P>

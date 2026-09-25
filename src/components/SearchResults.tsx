@@ -49,10 +49,14 @@ export default function SearchResults({
   offers,
   currencySymbol,
   storageKey,
+  offerQuery,
 }: {
   /** Every offer for the search, cheapest first. */
   offers: ResultOffer[];
   currencySymbol: string;
+  /** Appended to each offer link so the offer page knows which search it
+   *  came from (for its price comparison). Empty if the search is invalid. */
+  offerQuery: string;
   /** Identifies this search, so filters survive going into an offer and
    *  back (the page remounts on back navigation) without leaking into a
    *  different search. */
@@ -165,6 +169,7 @@ export default function SearchResults({
                   offer={offer}
                   isBest={index === 0}
                   eagerImage={index < EAGER_IMAGES}
+                  offerQuery={offerQuery}
                 />
               ))}
             </div>

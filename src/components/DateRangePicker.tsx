@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  formatLongDate,
-  heuristicPriceTier,
-  toIso,
-  type PriceTier,
-} from "@/lib/formatDateTime";
+import { formatLongDate, toIso } from "@/lib/formatDateTime";
 
 type Props = {
   pickupDate: string;
@@ -36,12 +31,6 @@ function monthCells(year: number, month: number): (string | null)[] {
   }
   return cells;
 }
-
-const TIER_CLASSES: Record<PriceTier, string> = {
-  low: "text-green-700 dark:text-green-400",
-  mid: "text-orange-700 dark:text-orange-400",
-  high: "text-red-600 dark:text-red-400",
-};
 
 function CalendarIcon() {
   return (
@@ -185,7 +174,6 @@ export default function DateRangePicker({
                       const isDropoff = iso === draftDropoff;
                       const inRange =
                         !!draftDropoff && iso > draftPickup && iso < draftDropoff;
-                      const tier = heuristicPriceTier(iso);
 
                       return (
                         <button
@@ -197,10 +185,10 @@ export default function DateRangePicker({
                             isPickup || isDropoff
                               ? "bg-orange-600 text-white"
                               : inRange
-                                ? `bg-orange-100 dark:bg-orange-900/30 ${TIER_CLASSES[tier]}`
+                                ? "bg-orange-100 text-slate-900 dark:bg-orange-900/30 dark:text-neutral-100"
                                 : disabled
                                   ? ""
-                                  : `hover:bg-orange-50 dark:hover:bg-orange-950/30 ${TIER_CLASSES[tier]}`
+                                  : "text-slate-800 hover:bg-orange-50 dark:text-neutral-100 dark:hover:bg-orange-950/30"
                           }`}
                         >
                           {Number(iso.slice(-2))}
@@ -213,17 +201,6 @@ export default function DateRangePicker({
             </div>
 
             <div className="shrink-0 border-t border-slate-200 p-4 dark:border-neutral-700/60">
-              <div className="mb-3 flex items-center justify-center gap-4 text-xs text-slate-500 dark:text-neutral-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-green-500" /> Cheaper
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-orange-500" /> Average
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-500" /> Pricier
-                </span>
-              </div>
               <button
                 type="button"
                 onClick={handleApply}

@@ -38,14 +38,18 @@ export default function OfferCard({
   offer,
   isBest,
   eagerImage = false,
+  offerQuery = "",
 }: {
   offer: ResultOffer;
   isBest: boolean;
   /** Only the first few results should load eagerly - the rest are below
    *  the fold and lazy-load as they scroll into view. */
   eagerImage?: boolean;
+  /** The search this result came from, passed to the offer page. */
+  offerQuery?: string;
 }) {
   const days = rentalDays(offer.pickupAt, offer.dropoffAt);
+  const href = `/book/${offer.offerId}${offerQuery ? `?${offerQuery}` : ""}`;
   const imageUrl = carImageAt(offer.imageUrl, 200);
   const price = `${getCurrency(offer.currency).symbol}${offer.totalPrice.toFixed(2)}`;
   const loading = eagerImage ? "eager" : "lazy";
@@ -160,14 +164,22 @@ export default function OfferCard({
         </div>
 
         <a
-          href={`/book/${offer.offerId}`}
+          href={href}
           className="mt-4 block w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-600 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700"
         >
           View
         </a>
       </div>
 
-      <OfferRow offer={offer} isBest={isBest} days={days} price={price} imageUrl={imageUrl} loading={loading} />
+      <OfferRow
+        offer={offer}
+        isBest={isBest}
+        days={days}
+        price={price}
+        imageUrl={imageUrl}
+        loading={loading}
+        href={href}
+      />
     </>
   );
 }
@@ -187,6 +199,7 @@ function OfferRow({
   price,
   imageUrl,
   loading,
+  href,
 }: {
   offer: ResultOffer;
   isBest: boolean;
@@ -194,6 +207,7 @@ function OfferRow({
   price: string;
   imageUrl: string | null;
   loading: "eager" | "lazy";
+  href: string;
 }) {
   return (
     <div
@@ -282,7 +296,7 @@ function OfferRow({
           </div>
         </div>
         <a
-          href={`/book/${offer.offerId}`}
+          href={href}
           className="block w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-600 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700"
         >
           View

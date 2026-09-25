@@ -1,14 +1,14 @@
 const isDev = process.env.NODE_ENV === "development";
 
 // Nonce-based CSP would force every page (including the statically
-// prerendered marketing pages: /, /privacy, /terms, /partner) into dynamic
+// prerendered marketing pages: /, /privacy, /terms) into dynamic
 // rendering - see node_modules/next/dist/docs/01-app/02-guides/
 // content-security-policy.md. Not worth that trade-off here, so this is the
 // "Without Nonces" variant from the same guide, with 'unsafe-inline'
-// covering our two static (non-user-controlled) inline scripts.
+// covering our static (non-user-controlled) theme-boot inline script.
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://utt.impactcdn.com${isDev ? " 'unsafe-eval'" : ""};
+  script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""};
   style-src 'self' 'unsafe-inline';
   img-src 'self' https: data:;
   font-src 'self';

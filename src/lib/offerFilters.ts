@@ -1,9 +1,13 @@
 import type { NormalizedOffer } from "./discovercars";
 
-/** What the results page actually needs per offer - the booking URL (the
- *  longest field, and only used on the detail page) is dropped so the full
- *  offer list stays cheap to hand to the client for instant filtering. */
-export type ResultOffer = Omit<NormalizedOffer, "bookingUrl" | "fuel">;
+/** What the results page actually needs per offer - the booking URL and
+ *  pickup instructions (the longest fields, only used on the detail page)
+ *  are dropped so the full offer list stays cheap to hand to the client for
+ *  instant filtering. */
+export type ResultOffer = Omit<
+  NormalizedOffer,
+  "bookingUrl" | "fuel" | "pickupInstructions" | "pickupType"
+>;
 
 export function toResultOffer(offer: NormalizedOffer): ResultOffer {
   return {
@@ -29,6 +33,7 @@ export function toResultOffer(offer: NormalizedOffer): ResultOffer {
     includedMileageLimit: offer.includedMileageLimit,
     mileageUnit: offer.mileageUnit,
     depositAmount: offer.depositAmount,
+    depositMax: offer.depositMax,
     depositCurrency: offer.depositCurrency,
   };
 }
@@ -117,13 +122,30 @@ export function categoryLabel(category: string): string {
   return CATEGORY_LABELS[category] ?? category.charAt(0).toUpperCase() + category.slice(1);
 }
 
+const CATEGORY_NOUNS: Record<string, [singular: string, plural: string]> = {
+  suv: ["SUV", "SUVs"],
+  vans: ["van", "vans"],
+  convertible: ["convertible", "convertibles"],
+  recreational: ["recreational vehicle", "recreational vehicles"],
+};
+
+/** For running text: "small car" / "small cars", "SUV" / "SUVs". */
+export function categoryNoun(category: string, plural: boolean): string {
+  const nouns = CATEGORY_NOUNS[category];
+  if (nouns) return plural ? nouns[1] : nouns[0];
+  return `${category} car${plural ? "s" : ""}`;
+}
+
 function matchesDeposit(offer: ResultOffer, deposit: DepositFilter): boolean {
   if (deposit === "any") return true;
   // No deposit info at all isn't the same as "no deposit" - leave it out of
   // every specific bucket rather than guess.
   if (offer.depositAmount === null) return false;
-  if (deposit === "none") return offer.depositAmount === 0;
-  return offer.depositAmount <= Number(deposit);
+  // Judge by the top of a quoted range: "Up to £250" has to mean the hold
+  // can't be more than £250.
+  const highest = offer.depositMax ?? offer.depositAmount;
+  if (deposit === "none") return highest === 0;
+  return highest <= Number(deposit);
 }
 
 /** `ignore` skips one filter - used for faceted counts/prices, so e.g. the

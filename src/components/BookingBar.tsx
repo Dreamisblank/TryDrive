@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrency } from "@/lib/currency";
+import { formatDeposit, hasNoDeposit } from "@/lib/deposit";
 
 function InfoIcon() {
   return (
@@ -68,12 +69,14 @@ function ShareIcon() {
 export default function BookingBar({
   bookingUrl,
   depositAmount,
+  depositMax,
   depositCurrency,
   currency,
   shareTitle,
 }: {
   bookingUrl: string;
   depositAmount: number | null;
+  depositMax: number | null;
   depositCurrency: string | null;
   currency: string;
   shareTitle: string;
@@ -115,10 +118,29 @@ export default function BookingBar({
     }
   }
 
-  const depositLabel =
-    depositAmount !== null
-      ? `${getCurrency(depositCurrency ?? currency).symbol}${depositAmount.toFixed(0)}`
-      : "None";
+  // Only states what the offer itself says - release terms and anything the
+  // offer doesn't list are left to the rental conditions.
+  const deposit =
+    depositAmount === null
+      ? {
+          value: "Deposit",
+          showLabel: false,
+          detail: "The deposit for this car isn't listed - it's set out in the rental conditions.",
+        }
+      : hasNoDeposit(depositAmount, depositMax)
+        ? { value: "No deposit", showLabel: false, detail: "This offer doesn't list a deposit." }
+        : (() => {
+            const amount = formatDeposit(
+              depositAmount,
+              depositMax,
+              getCurrency(depositCurrency ?? currency).symbol,
+            );
+            return {
+              value: amount,
+              showLabel: true,
+              detail: `A deposit of ${amount} is held on your card at pickup. When it's released is set out in the rental conditions.`,
+            };
+          })();
 
   return (
     <>
@@ -143,20 +165,20 @@ export default function BookingBar({
                 className="flex items-center gap-1.5 rounded-full px-2.5 py-2 text-left transition hover:bg-orange-500/5"
               >
                 <span className="text-sm font-semibold whitespace-nowrap text-slate-900 dark:text-neutral-100">
-                  {depositLabel}
+                  {deposit.value}
                 </span>
-                <span className="hidden text-xs text-slate-500 sm:inline dark:text-neutral-400">
-                  Deposit
-                </span>
+                {deposit.showLabel && (
+                  <span className="hidden text-xs text-slate-500 sm:inline dark:text-neutral-400">
+                    Deposit
+                  </span>
+                )}
                 <span className="text-slate-400 dark:text-neutral-500">
                   <InfoIcon />
                 </span>
               </button>
               {openPanel === "deposit" && (
                 <div className="absolute bottom-full left-0 z-40 mb-2 w-56 rounded-2xl border border-orange-900/5 bg-white p-3 text-xs text-slate-600 shadow-xl dark:border-neutral-700/60 dark:bg-neutral-900 dark:text-neutral-300">
-                  {depositAmount !== null
-                    ? `A refundable ${depositLabel} hold is taken on your card at pickup, released after the car's returned undamaged.`
-                    : "No deposit hold is required for this car."}
+                  {deposit.detail}
                 </div>
               )}
             </div>
@@ -209,7 +231,7 @@ export default function BookingBar({
                     </div>
                   </div>
                   <p className="mt-2 text-xs text-slate-400 dark:text-neutral-500">
-                    Let the supplier know at pickup - extra drivers are added and priced there.
+                    Additional driver fees and rules are in the rental conditions.
                   </p>
                 </div>
               )}
@@ -234,11 +256,14 @@ export default function BookingBar({
               )}
             </div>
 
-            {/* Book */}
+            {/* Book. No "noreferrer": the Discover Cars affiliate agreement
+                (3.8) may treat a sale with no referral URL as coming from a
+                prohibited traffic source and withhold commission. The site's
+                Referrer-Policy sends only our origin, never the search. */}
             <a
               href={bookingUrl}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="shrink-0 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2.5 text-sm font-semibold whitespace-nowrap text-white shadow-sm transition hover:from-orange-600 hover:to-orange-700 sm:px-6"
             >
               <span className="sm:hidden">Book</span>

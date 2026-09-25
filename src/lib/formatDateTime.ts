@@ -20,6 +20,12 @@ export function earliestPickupIso(): string {
   return addDays(toIso(new Date()), 2);
 }
 
+/** Searches always ask for 10:00 pickup and return. Shared so the results
+ *  page and the offer page's live price comparison search the same window. */
+export function searchDateTime(date: string): string {
+  return `${date}T10:00:00`;
+}
+
 /** "2026-10-10T10:00:00" or "...+03:00" -> "10:00". Ignores any offset - the
  *  API echoes back local time at the pickup/dropoff location, not UTC. */
 export function formatTime(iso: string): string {
@@ -56,22 +62,4 @@ export function formatLongDate(iso: string): string {
   ];
   const [, year, month, day] = match;
   return `${Number(day)} ${months[Number(month) - 1]} ${year}`;
-}
-
-export type PriceTier = "low" | "mid" | "high";
-
-/**
- * Illustrative only - Discover Cars has no calendar/price-by-date endpoint,
- * so there's no cheap way to show a real per-day price without running a
- * full offers search (a multi-MB response) for every visible date. This is
- * a day-of-week heuristic instead: weekend pickups genuinely do skew
- * pricier for rental demand generally, but this is NOT the real price for
- * any specific search. Swap this out if/when a real per-day price source
- * exists.
- */
-export function heuristicPriceTier(iso: string): PriceTier {
-  const day = new Date(`${iso}T00:00:00`).getDay(); // 0=Sun..6=Sat
-  if (day === 5 || day === 6) return "high";
-  if (day === 0 || day === 1) return "mid";
-  return "low";
 }

@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import BackLink from "@/components/BackLink";
+import BelowAveragePrice from "@/components/BelowAveragePrice";
 import BookingBar from "@/components/BookingBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
@@ -6,15 +8,22 @@ import SkyBackground from "@/components/SkyBackground";
 import { getOffer } from "@/lib/discovercars";
 import { formatShortDate, formatTime, rentalDays } from "@/lib/formatDateTime";
 import { getCurrency } from "@/lib/currency";
-import PriceComparisonBox from "@/components/PriceComparisonBox";
+import { formatDeposit, hasNoDeposit } from "@/lib/deposit";
+import { parseSearchContext } from "@/lib/priceComparison";
+import PriceComparisonBox, { PriceComparisonSkeleton } from "@/components/PriceComparisonBox";
 import TerminalTransferBox from "@/components/TerminalTransferBox";
 
 type BookPageProps = {
   params: Promise<{ offerId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function BookPage({ params }: BookPageProps) {
+export default async function BookPage({ params, searchParams }: BookPageProps) {
   const { offerId } = await params;
+  // The search this offer came from (carried over from the results page).
+  // Without it - e.g. an old link - the price comparison is simply left out
+  // rather than guessed.
+  const searchContext = parseSearchContext(await searchParams);
 
   let offer: Awaited<ReturnType<typeof getOffer>> = null;
   let error: string | null = null;
@@ -73,9 +82,24 @@ export default async function BookPage({ params }: BookPageProps) {
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-slate-900 dark:text-neutral-100">
-                  {getCurrency(offer.currency).symbol}
-                  {offer.totalPrice.toFixed(2)}
+                {/* relative: the "?" tooltip anchors to this row. The label
+                    streams in once the live comparison search finishes;
+                    it sits left of the price so the price never moves. */}
+                <div className="relative flex items-center justify-end gap-3">
+                  {searchContext && (
+                    <Suspense fallback={null}>
+                      <BelowAveragePrice
+                        context={searchContext}
+                        currency={offer.currency}
+                        category={offer.category}
+                        price={offer.totalPrice}
+                      />
+                    </Suspense>
+                  )}
+                  <div className="text-3xl font-bold text-slate-900 dark:text-neutral-100">
+                    {getCurrency(offer.currency).symbol}
+                    {offer.totalPrice.toFixed(2)}
+                  </div>
                 </div>
                 {offer.freeCancellation && (
                   <div className="text-xs text-green-600 dark:text-green-400">
@@ -152,8 +176,13 @@ export default async function BookPage({ params }: BookPageProps) {
                 </span>
                 {offer.depositAmount !== null && (
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
-                    {getCurrency(offer.depositCurrency ?? offer.currency).symbol}
-                    {offer.depositAmount.toFixed(0)} deposit
+                    {hasNoDeposit(offer.depositAmount, offer.depositMax)
+                      ? "No deposit"
+                      : `${formatDeposit(
+                          offer.depositAmount,
+                          offer.depositMax,
+                          getCurrency(offer.depositCurrency ?? offer.currency).symbol,
+                        )} deposit`}
                   </span>
                 )}
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
@@ -162,16 +191,22 @@ export default async function BookPage({ params }: BookPageProps) {
               </div>
             </div>
 
-            <PriceComparisonBox
-              offerId={offer.offerId}
-              category={offer.category}
-              totalPrice={offer.totalPrice}
-              currency={offer.currency}
-            />
+            {searchContext && (
+              <Suspense fallback={<PriceComparisonSkeleton />}>
+                <PriceComparisonBox
+                  context={searchContext}
+                  currency={offer.currency}
+                  category={offer.category}
+                  price={offer.totalPrice}
+                />
+              </Suspense>
+            )}
 
             <TerminalTransferBox
               pickupLocationName={offer.pickupLocationName}
               supplierName={offer.supplierName}
+              pickupInstructions={offer.pickupInstructions}
+              pickupType={offer.pickupType}
             />
           </div>
         )}
@@ -181,6 +216,7 @@ export default async function BookPage({ params }: BookPageProps) {
         <BookingBar
           bookingUrl={offer.bookingUrl}
           depositAmount={offer.depositAmount}
+          depositMax={offer.depositMax}
           depositCurrency={offer.depositCurrency}
           currency={offer.currency}
           shareTitle={`${offer.vehicleName} · ${getCurrency(offer.currency).symbol}${offer.totalPrice.toFixed(2)} on TryDrive`}

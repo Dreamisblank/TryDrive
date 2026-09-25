@@ -7,6 +7,8 @@ import { searchOffers } from "@/lib/discovercars";
 import { getSelectedCurrency } from "@/lib/currencyServer";
 import { getCurrency } from "@/lib/currency";
 import { FILTER_STORAGE_PREFIX, toResultOffer } from "@/lib/offerFilters";
+import { searchDateTime } from "@/lib/formatDateTime";
+import { parseSearchContext, searchContextQuery } from "@/lib/priceComparison";
 import type { PickupLocation } from "@/lib/locations";
 
 type SearchPageProps = {
@@ -25,6 +27,7 @@ type SearchPageProps = {
 export default async function SearchResultsPage({
   searchParams,
 }: SearchPageProps) {
+  const rawParams = await searchParams;
   const {
     location,
     pickupDate,
@@ -34,7 +37,7 @@ export default async function SearchResultsPage({
     iata,
     lat,
     lng,
-  } = await searchParams;
+  } = rawParams;
   const parsedAge = Number(driverAge);
   const parsedLat = lat ? Number(lat) : undefined;
   const parsedLng = lng ? Number(lng) : undefined;
@@ -54,8 +57,8 @@ export default async function SearchResultsPage({
     try {
       offers = await searchOffers({
         location: { iata, latitude: parsedLat, longitude: parsedLng },
-        pickupAt: `${pickupDate}T10:00:00`,
-        dropoffAt: `${dropoffDate}T10:00:00`,
+        pickupAt: searchDateTime(pickupDate!),
+        dropoffAt: searchDateTime(dropoffDate!),
         driverAge: parsedAge,
         driverResidence: residence!,
         currency,
@@ -86,6 +89,11 @@ export default async function SearchResultsPage({
       : undefined;
 
   const filterStorageKey = `${FILTER_STORAGE_PREFIX}${iata ?? `${parsedLat},${parsedLng}`}:${pickupDate}:${dropoffDate}:${driverAge}`;
+
+  // Carried onto each offer's page so its price can be compared against the
+  // same search (same dates, location and driver age).
+  const searchContext = parseSearchContext(rawParams);
+  const offerQuery = searchContext ? searchContextQuery(searchContext) : "";
 
   return (
     <div className="flex-1">
@@ -140,6 +148,7 @@ export default async function SearchResultsPage({
             offers={offers.map(toResultOffer)}
             currencySymbol={getCurrency(currency).symbol}
             storageKey={filterStorageKey}
+            offerQuery={offerQuery}
           />
         )}
       </main>

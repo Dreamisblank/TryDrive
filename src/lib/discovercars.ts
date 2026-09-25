@@ -103,11 +103,11 @@ export type OfferSearchParams = {
 
 // Real shape of one offer from POST /v1/offers / GET /v1/offers/:id.
 // Trimmed to the fields this app actually uses - the raw response carries
-// more (opening_hours, pickup/dropoff instructions, rating_detailed, etc.)
-// that can be added here if a future screen needs them.
+// more (opening_hours, rating_detailed, etc.) that can be added here if a
+// future screen needs them.
 type DiscoverCarsOffer = {
   offer_id: string;
-  pickup: { pickup_at: string; location: string };
+  pickup: { pickup_at: string; location: string; instructions?: string | null };
   dropoff: { dropoff_at: string; location: string };
   car: {
     name: string;
@@ -125,6 +125,9 @@ type DiscoverCarsOffer = {
     logo: string | null;
     rating: number | null;
     review_count: number | null;
+    /** Seen: in_terminal, shuttle_bus, meet_and_greet, outside_of_terminal,
+     *  car_rental_center. */
+    location_type?: string | null;
   };
   price: {
     total: number;
@@ -167,8 +170,15 @@ export type NormalizedOffer = {
   unlimitedMileage: boolean;
   includedMileageLimit: number | null;
   mileageUnit: string;
+  /** Lowest deposit quoted; null when the offer lists none at all. */
   depositAmount: number | null;
+  /** Highest deposit quoted - some suppliers give a range (e.g. £31-£196). */
+  depositMax: number | null;
   depositCurrency: string | null;
+  /** The rental company's own directions to its pickup desk. */
+  pickupInstructions: string | null;
+  /** How pickup works, e.g. "shuttle_bus" - see DiscoverCarsOffer. */
+  pickupType: string | null;
   bookingUrl: string;
 };
 
@@ -197,7 +207,10 @@ function normalizeOffer(offer: DiscoverCarsOffer): NormalizedOffer {
     includedMileageLimit: offer.mileage.included_limit,
     mileageUnit: offer.mileage.unit,
     depositAmount: offer.deposit?.min ?? null,
+    depositMax: offer.deposit?.max ?? null,
     depositCurrency: offer.deposit?.currency ?? null,
+    pickupInstructions: offer.pickup.instructions?.trim() || null,
+    pickupType: offer.supplier.location_type ?? null,
     bookingUrl: offer.url.web,
   };
 }
