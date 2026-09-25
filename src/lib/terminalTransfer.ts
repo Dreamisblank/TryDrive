@@ -108,3 +108,63 @@ export function getTerminalTransferGuidance(
     source: match ? "specific" : "generic",
   };
 }
+
+const MAX_STEPS = 4;
+
+// A full stop after one of these doesn't end the sentence ("parking space
+// no. 861", "approx. 5 minutes").
+const ABBREVIATIONS = new Set([
+  "e.g", "i.e", "approx", "no", "st", "min", "mins", "tel", "etc", "nr", "km", "hrs",
+  "mr", "mrs", "ms", "dr", "vs",
+]);
+
+function splitSentences(line: string): string[] {
+  // Suppliers often skip the space after a full stop ("building.The agent"),
+  // so a stop directly followed by a capital also ends a sentence.
+  const parts = line.split(/(?<=[.!?])(?:\s+|(?=[A-Z]))/);
+  const sentences: string[] = [];
+  let buffer = "";
+  for (const part of parts) {
+    buffer = buffer ? `${buffer} ${part.trim()}` : part.trim();
+    const lastWord = buffer.split(/\s+/).pop()?.replace(/\.$/, "").toLowerCase() ?? "";
+    if (buffer.endsWith(".") && ABBREVIATIONS.has(lastWord)) continue;
+    if (buffer) sentences.push(buffer);
+    buffer = "";
+  }
+  if (buffer) sentences.push(buffer);
+  return sentences;
+}
+
+/**
+ * Turns a rental company's free-text pickup directions into at most four
+ * short numbered steps, in their original order (directions come first in
+ * practice; the rest is usually documents, fuel and fee policy).
+ * `truncated` flags when there was more, so the full text can still be
+ * offered - nothing is thrown away, just not put in the steps.
+ *
+ * Tested against every distinct instruction in live searches for VLC, MLA
+ * and AGP (60 texts): hard-wrapped lines, missing spaces after full stops,
+ * supplier numbering ("1.- ") and ALL-CAPS preambles are all handled.
+ */
+export function toPickupSteps(text: string): { steps: string[]; truncated: boolean } {
+  const lines = text
+    .replace(/\r/g, "")
+    // A line break before a lowercase word is a hard wrap mid-sentence
+    // (sometimes indented: "follow the signs\n to the car park").
+    .replace(/\n[ \t]*(?=[a-z])/g, " ")
+    .split(/\n+/)
+    .map((line) => line.replace(/^\s*(?:[-*•]|\d+\s*[.)]-?)\s+/, "").trim())
+    .filter(Boolean);
+
+  const sentences = lines.flatMap(splitSentences);
+  if (sentences.length > 0) {
+    // Drop a shouty preamble like "IMPORTANT: VEHICLE PICK-UP INSTRUCTIONS".
+    sentences[0] = sentences[0].replace(/^(?:[A-Z][A-Z'-]*:?\s+){2,}(?=[A-Z][a-z])/, "");
+  }
+  const cleaned = sentences
+    .map((sentence) => sentence.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((sentence) => sentence.charAt(0).toUpperCase() + sentence.slice(1));
+
+  return { steps: cleaned.slice(0, MAX_STEPS), truncated: cleaned.length > MAX_STEPS };
+}

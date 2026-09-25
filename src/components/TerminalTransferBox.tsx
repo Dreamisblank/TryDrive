@@ -1,4 +1,4 @@
-import { getTerminalTransferGuidance } from "@/lib/terminalTransfer";
+import { getTerminalTransferGuidance, toPickupSteps } from "@/lib/terminalTransfer";
 
 const PICKUP_TYPE_LABELS: Record<string, string> = {
   in_terminal: "Desk in the terminal",
@@ -16,6 +16,25 @@ function Heading() {
     <h2 className="text-sm font-semibold tracking-wide text-slate-500 uppercase dark:text-neutral-400">
       Getting to your car
     </h2>
+  );
+}
+
+function Steps({ steps }: { steps: string[] }) {
+  return (
+    <ol className="mt-3 flex flex-col gap-2.5">
+      {steps.map((step, index) => (
+        <li key={index} className="flex gap-3 text-sm leading-relaxed text-slate-700 dark:text-neutral-200">
+          <span
+            aria-hidden="true"
+            className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-semibold text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+          >
+            {index + 1}
+          </span>
+          {/* break-words: some directions contain long unbroken URLs. */}
+          <span className="min-w-0 pt-0.5 break-words">{step}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -38,7 +57,9 @@ export default function TerminalTransferBox({
 }) {
   const typeLabel = pickupType ? PICKUP_TYPE_LABELS[pickupType] : undefined;
 
-  if (pickupInstructions) {
+  const supplierSteps = pickupInstructions ? toPickupSteps(pickupInstructions) : null;
+
+  if (pickupInstructions && supplierSteps && supplierSteps.steps.length > 0) {
     return (
       <div className={cardClass}>
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -49,9 +70,19 @@ export default function TerminalTransferBox({
             </span>
           )}
         </div>
-        <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-slate-700 dark:text-neutral-200">
-          {pickupInstructions}
-        </p>
+        <Steps steps={supplierSteps.steps} />
+        {supplierSteps.truncated && (
+          // The steps keep the first four points; the rest (documents,
+          // fuel, fees...) stays one tap away rather than being dropped.
+          <details className="mt-3">
+            <summary className="cursor-pointer text-xs font-medium text-orange-700 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300">
+              See full directions from {supplierName}
+            </summary>
+            <p className="mt-2 text-xs leading-relaxed break-words whitespace-pre-line text-slate-500 dark:text-neutral-400">
+              {pickupInstructions}
+            </p>
+          </details>
+        )}
         <p className="mt-3 text-xs text-slate-400 dark:text-neutral-500">
           Directions from {supplierName}. Check your booking confirmation for any updates.
         </p>
@@ -65,7 +96,7 @@ export default function TerminalTransferBox({
   return (
     <div className={cardClass}>
       <Heading />
-      <p className="mt-2 text-sm text-slate-700 dark:text-neutral-200">{guidance.instructions}</p>
+      <Steps steps={toPickupSteps(guidance.instructions).steps} />
       {guidance.source === "specific" && (
         <p className="mt-3 text-xs text-slate-400 dark:text-neutral-500">
           Pickup points can change - confirm against your booking email from {supplierName} on arrival.
